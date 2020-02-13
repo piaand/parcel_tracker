@@ -60,6 +60,8 @@ FROM debian:stretch-slim
 ENV JAVA_HOME=/opt/java-minimal
 ENV PATH="$PATH:$JAVA_HOME/bin"
 ENV SRC="/src"
+# ENV SQLITE_URL="https://bitbucket.org/xerial/sqlite-jdbc/downloads/sqlite-jdbc-3.30.1.jar"
+# ENV SQLITE="sqlite-jdbc-3.30.1.jar"
 
 #install vim and create sourcecode directory - delete vim after development
 RUN apt-get update && apt-get upgrade -y && apt-get install -y vim && \
@@ -67,6 +69,9 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y vim && \
 
 COPY --from=packager "$JAVA_HOME" "$JAVA_HOME"
 COPY "/source" "$SRC"
+
+# downlodad SQLite to the local file - fix the download to right folder at the end of development
+# ADD "$SQLITE_URL" "$SQLITE"
 
 EXPOSE 8080
 # CMD [ "app.java"] uncommented for development
