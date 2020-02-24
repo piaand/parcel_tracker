@@ -8,15 +8,21 @@ public class Dashboard {
 
 	public static void main(String[] args) {
 		int key;
+		boolean error;
 
+		key = 0;
+		error = false;
 		printWelcome();
-		printInstructions();
-		key = askNextStep();
-		switchTable(key);
+		while (key != 9 && (!error))
+		{
+			printInstructions();
+			key = askNextStep();
+			error = switchTable(key);
+		}
 
 	}
 	
-	/*public static int initTable(String[] args) throws SQLException {
+	public static boolean initTable() throws SQLException {
         Connection db = DriverManager.getConnection("jdbc:sqlite:testi.db");
         Statement s = db.createStatement();
         s.execute("CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER)");
@@ -29,7 +35,8 @@ public class Dashboard {
         ResultSet r = s.executeQuery("SELECT * FROM Tuotteet");
         while (r.next()) {
             System.out.println(r.getInt("id")+" "+r.getString("nimi")+" "+r.getInt("hinta"));
-        }*/
+		}
+	}
 
 	public static int askNextStep() {
 		int key;
@@ -52,44 +59,48 @@ public class Dashboard {
 	}
 
 	
-	public static void switchTable(int key) {
+	public static boolean switchTable(int key) {
+		boolean ok;
+		
+		ok = true;
 		if (key == 1)
 		{	
 			System.out.println("Creating a database\n");
-			//initTable();
+			initTable();
 		}
-		if (key == 2)
+		else if (key == 2)
 		{
 			System.out.println("Add a new place\n");
 		}
-		if (key == 3)
+		else if (key == 3)
 		{
 			System.out.println("add a new orderer\n");
 		}
-		if (key == 4)
+		else if (key == 4)
 		{
 			System.out.println("ADD A NEW APARCEL\n");
 		}
-		if (key == 5)
+		else if (key == 5)
 		{
 			System.out.println("add a new event\n");
 		}
-		if (key == 6)
+		else if (key == 6)
 		{
 			System.out.println("fetch all parcel events\n");
 		}
-		if (key == 7)
+		else if (key == 7)
 		{
 			System.out.println("fetch  all parcels of the orderer\n");
 		}
-		if (key == 8)
+		else if (key == 8)
 		{
 			System.out.println("fetch nnumber of events related to av place\n");
 		}
-		if (key == 9)
+		else
 		{
 			System.out.println("Byebye! System closes now\n");
 		}
+		return (ok);
 	}
 	
 	public static void printInstructions() {
