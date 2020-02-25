@@ -1,4 +1,5 @@
 import java.util.*; 
+import java.sql.*; // Impporta Java sql package
 
 public class Place {
 	
@@ -16,5 +17,25 @@ public class Place {
 	public void printPlace() {
 		System.out.println("Name of the place:"+ name );
 		System.out.println("ID:"+ id );
+	}
+
+	public void insertPlace() throws SQLException {
+		Connection db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+		PreparedStatement p = db.prepareStatement("INSERT INTO Place(id,name) VALUES (?,?)");
+        p.setInt(1,this.id);
+        p.setString(2,this.name);
+
+        p.executeUpdate();
+		System.out.println("Added the following:");
+		this.printPlace();
+	}
+
+	public static void queryPlaceAll() throws SQLException {
+		Connection db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+		Statement s = db.createStatement();
+		ResultSet r = s.executeQuery("SELECT * FROM Place");
+        while (r.next()) {
+			System.out.println(r.getInt("id")+" "+r.getString("name"));
+		}
 	}
 }

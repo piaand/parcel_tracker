@@ -95,7 +95,8 @@ public class Dashboard {
 		{
 			System.out.println("Add a new place\n");
 			Place myplace = new Place();
-			myplace.printPlace();
+			myplace.insertPlace();
+			queryPlaceAll();
 		}
 		else if (key == 3)
 		{
