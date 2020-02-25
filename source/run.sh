@@ -1,1 +1,1 @@
-javac Dashboard.java && java -classpath ":sqlite-jdbc-3.30.1.jar" Dashboard
+javac Dashboard.java Place.java && java -classpath ":sqlite-jdbc-3.30.1.jar" Dashboard

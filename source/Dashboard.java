@@ -9,16 +9,14 @@ public class Dashboard {
 
 	public static void main(String[] args) throws SQLException {
 		int key;
-		boolean error;
 
 		key = 0;
-		error = false;
 		printWelcome();
-		while (key != 9 && (!error))
+		while (key != 9)
 		{
 			printInstructions();
 			key = askNextStep();
-			error = switchTable(key);
+			switchTable(key);
 		}
 
 	}
@@ -80,10 +78,8 @@ public class Dashboard {
 	}
 
 	
-	public static boolean switchTable(int key) throws SQLException {
-		boolean error;
-		
-		error = false;
+	public static void switchTable(int key) throws SQLException {
+
 		if (key == 1)
 		{	
 			System.out.println("Creating a database\n");
@@ -98,6 +94,8 @@ public class Dashboard {
 		else if (key == 2)
 		{
 			System.out.println("Add a new place\n");
+			Place myplace = new Place();
+			myplace.printPlace();
 		}
 		else if (key == 3)
 		{
@@ -127,7 +125,6 @@ public class Dashboard {
 		{
 			System.out.println("Byebye! System closes now\n");
 		}
-		return (error);
 	}
 	
 	public static void printInstructions() {
