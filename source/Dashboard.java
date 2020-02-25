@@ -29,8 +29,6 @@ public class Dashboard {
 		s.execute("CREATE TABLE Place (id INTEGER PRIMARY KEY, name STRING)");
 		//s.execute("CREATE TABLE Events (id INTEGER PRIMARY KEY, tracing_id INTEGER FOREIGN KEY, place_id INTEGER FOREIGN KEY, event_time (date TEXT), description STRING)");
 
-		s.execute("INSERT INTO Orderer (id,first_name,last_name) VALUES (1,'Jukka','Kuoppanen')");
-		s.execute("INSERT INTO Place (id,name) VALUES (2,'Helsinki')");
 		s.execute("INSERT INTO Parcel (id,order_id,current_place_id) VALUES (10,8,12)");
 
         ResultSet r = s.executeQuery("SELECT * FROM Orderer");
@@ -94,17 +92,26 @@ public class Dashboard {
 		else if (key == 2)
 		{
 			System.out.println("Add a new place\n");
-			Place myplace = new Place();
-			myplace.insertPlace();
-			queryPlaceAll();
+			try {
+				Place myplace = new Place();
+				myplace.insertPlace();
+			} catch (Exception e) {
+				System.out.println("Adding a new place to database didn't succeed - please try agin.\n");
+			}
 		}
 		else if (key == 3)
 		{
-			System.out.println("add a new orderer\n");
+			System.out.println("Add a new orderer\n");
+			Orderer myorder = new Orderer();
+			myorder.insertOrderer();
+			queryOrdererAll();
 		}
 		else if (key == 4)
 		{
-			System.out.println("ADD A NEW APARCEL\n");
+			System.out.println("Add a new parcel\n");
+			Parcel myparcel = new Parcel();
+			myparcel.insertParcel();
+			queryParcelAll();
 		}
 		else if (key == 5)
 		{
@@ -125,6 +132,36 @@ public class Dashboard {
 		else
 		{
 			System.out.println("Byebye! System closes now\n");
+		}
+		queryPlaceAll();
+		queryOrdererAll();
+		queryParcelAll();
+	}
+	
+	public static void queryPlaceAll() throws SQLException {
+		Connection db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+		Statement s = db.createStatement();
+		ResultSet r = s.executeQuery("SELECT * FROM Place");
+        while (r.next()) {
+			System.out.println(r.getInt("id")+" "+r.getString("name"));
+		}
+	}
+
+	public static void queryParcelAll() throws SQLException {
+		Connection db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+		Statement s = db.createStatement();
+		ResultSet r = s.executeQuery("SELECT * FROM Parcel");
+        while (r.next()) {
+			System.out.println(r.getInt("id")+" "+r.getString("name")+" "+r.getString("name"));
+		}
+	}
+
+	public static void queryOrdererAll() throws SQLException {
+		Connection db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+		Statement s = db.createStatement();
+		ResultSet r = s.executeQuery("SELECT * FROM Orderer");
+        while (r.next()) {
+			System.out.println(r.getInt("id")+" "+r.getString("order_id")+" "+r.getString("current_place_id"));
 		}
 	}
 	

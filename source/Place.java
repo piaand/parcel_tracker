@@ -30,12 +30,4 @@ public class Place {
 		this.printPlace();
 	}
 
-	public static void queryPlaceAll() throws SQLException {
-		Connection db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
-		Statement s = db.createStatement();
-		ResultSet r = s.executeQuery("SELECT * FROM Place");
-        while (r.next()) {
-			System.out.println(r.getInt("id")+" "+r.getString("name"));
-		}
-	}
 }
