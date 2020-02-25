@@ -1,3 +1,4 @@
+import java.text.*;
 import java.util.*;  // Import utilities like Scanner, lists etc.
 import java.sql.*; // Impporta Java sql package
 
@@ -6,7 +7,7 @@ public class Dashboard {
 	/*would it be better to create a Dashboar object at the beginning?
 	or continue with the main class and no variations? */
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SQLException {
 		int key;
 		boolean error;
 
@@ -22,21 +23,41 @@ public class Dashboard {
 
 	}
 	
-	public static boolean initTable() throws SQLException {
-        Connection db = DriverManager.getConnection("jdbc:sqlite:testi.db");
-        Statement s = db.createStatement();
-        s.execute("CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER)");
-        s.execute("INSERT INTO Tuotteet (nimi,hinta) VALUES ('retiisi',7)");
-        s.execute("INSERT INTO Tuotteet (nimi,hinta) VALUES ('porkkana',5)");
-        s.execute("INSERT INTO Tuotteet (nimi,hinta) VALUES ('nauris',4)");
-        s.execute("INSERT INTO Tuotteet (nimi,hinta) VALUES ('lanttu',8)");
-        s.execute("INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',4)");
+	public static void initTable() throws SQLException {
+        Connection db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+		Statement s = db.createStatement();
+        s.execute("CREATE TABLE Parcel (id INTEGER PRIMARY KEY, order_id INTEGER, current_place_id INTEGER, FOREIGN KEY(order_id) REFERENCES Orderer(id), FOREIGN KEY(current_place_id) REFERENCES Place(id))");
+		s.execute("CREATE TABLE Orderer (id INTEGER PRIMARY KEY, first_name STRING, last_name STRING)");
+		s.execute("CREATE TABLE Place (id INTEGER PRIMARY KEY, name STRING)");
+		//s.execute("CREATE TABLE Events (id INTEGER PRIMARY KEY, tracing_id INTEGER FOREIGN KEY, place_id INTEGER FOREIGN KEY, event_time (date TEXT), description STRING)");
 
-        ResultSet r = s.executeQuery("SELECT * FROM Tuotteet");
+		s.execute("INSERT INTO Orderer (id,first_name,last_name) VALUES (1,'Jukka','Kuoppanen')");
+		s.execute("INSERT INTO Place (id,name) VALUES (2,'Helsinki')");
+		s.execute("INSERT INTO Parcel (id,order_id,current_place_id) VALUES (10,8,12)");
+
+        ResultSet r = s.executeQuery("SELECT * FROM Orderer");
         while (r.next()) {
-            System.out.println(r.getInt("id")+" "+r.getString("nimi")+" "+r.getInt("hinta"));
+            System.out.println(r.getInt("id")+" "+r.getString("first_name")+" "+r.getString("last_name"));
+		}
+		ResultSet m = s.executeQuery("SELECT * FROM Parcel");
+		while (m.next()) {
+            System.out.println(m.getInt("id")+" "+m.getInt("order_id")+" "+m.getInt("current_place_id"));
 		}
 	}
+
+	/*public static void insertPlace() throws SQLException {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+		String ts = sdf.format(timestamp);
+		s.execute("INSERT INTO Events (id,tracing_id,place_id,event_time,description) VALUES (7, 70001, 3, ?, 'we describe her')"); {
+        	s.setString(1, ts);
+		}
+
+		ResultSet m = ps.executeQuery("SELECT * FROM Events");
+        while (m.next()) {
+            System.out.println(m.getInt("id")+" "+m.getInt("tracing_id")+" "+m.getInt("place_id")+" "+m.getString("event_time")+" "+m.getString("description"));
+		}
+	}*/
 
 	public static int askNextStep() {
 		int key;
@@ -59,14 +80,20 @@ public class Dashboard {
 	}
 
 	
-	public static boolean switchTable(int key) {
-		boolean ok;
+	public static boolean switchTable(int key) throws SQLException {
+		boolean error;
 		
-		ok = true;
+		error = false;
 		if (key == 1)
 		{	
 			System.out.println("Creating a database\n");
-			initTable();
+			try {
+				initTable();	
+			} catch (Exception e) {
+				System.out.println( e );
+				System.out.println("Creating database didn't succeed - exiting program.\n");
+				throw e;
+			}
 		}
 		else if (key == 2)
 		{
@@ -100,7 +127,7 @@ public class Dashboard {
 		{
 			System.out.println("Byebye! System closes now\n");
 		}
-		return (ok);
+		return (error);
 	}
 	
 	public static void printInstructions() {
