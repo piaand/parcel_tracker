@@ -17,6 +17,9 @@ public class Dashboard {
 			printInstructions();
 			key = askNextStep();
 			switchTable(key);
+			queryPlaceAll();
+			queryOrdererAll();
+			queryParcelAll();
 		}
 
 	}
@@ -122,13 +125,14 @@ public class Dashboard {
 		{
 			System.out.println("fetch nnumber of events related to av place\n");
 		}
+		else if (key == 10)
+		{
+			System.out.println("Doing performance tests\n");
+		}
 		else
 		{
 			System.out.println("Byebye! System closes now\n");
 		}
-		queryPlaceAll();
-		queryOrdererAll();
-		queryParcelAll();
 	}
 	
 	public static void queryPlaceAll() throws SQLException {
@@ -169,6 +173,7 @@ public class Dashboard {
 		System.out.println("Press 7 to fetch all the parcels and amount of events of an orderer");
 		System.out.println("Press 8 to fetch the number of events related to a place");
 		System.out.println("Press 9 to exit program");
+		System.out.println("Press 10 to run the performance tests");
 		System.out.println("-----------\n");
 	}
 	

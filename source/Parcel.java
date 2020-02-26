@@ -27,7 +27,7 @@ public class Parcel {
 		PreparedStatement p = db.prepareStatement("INSERT INTO Parcel(id,order_id,current_place_id) VALUES (?,?,?)");
         p.setString(1,this.id);
 		p.setInt(2,this.order_id);
-		p.setInt(2,this.current_place_id);
+		p.setInt(3,this.current_place_id);
 
         p.executeUpdate();
 		System.out.println("Added the following:");

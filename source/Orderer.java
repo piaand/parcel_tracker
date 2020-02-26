@@ -109,10 +109,13 @@ public class Orderer {
 
 	public void insertOrderer() throws SQLException {
 		Connection db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
-		PreparedStatement p = db.prepareStatement("INSERT INTO Place(id,first_name,last_name) VALUES (?,?,?)");
+		PreparedStatement p = db.prepareStatement("INSERT INTO Orderer(id,first_name,last_name) VALUES (?,?,?)");
         p.setInt(1,this.id);
 		p.setString(2,this.first_name);
 		p.setString(3,this.last_name);
+		//print out this.id, this.name values before executing sql - this fails now
+		// might be because i dont close connection - do db.close after every use https://bukkit.org/threads/sqlite-the-database-file-is-locked.139372/
+		// google singleton class
 
         p.executeUpdate();
 		System.out.println("Added the following:");
