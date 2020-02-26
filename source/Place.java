@@ -11,7 +11,7 @@ public class Place {
 		Scanner input = new Scanner(System.in);
 		System.out.println("Enter here the name of the place: ");
 		this.name = input.nextLine();
-		this.id = count++;
+		this.id = count;
 	}
 
 	public void printPlace() {
@@ -28,14 +28,7 @@ public class Place {
         p.executeUpdate();
 		System.out.println("Added the following:");
 		this.printPlace();
+		count++;
 	}
 
-	public static void queryPlaceAll() throws SQLException {
-		Connection db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
-		Statement s = db.createStatement();
-		ResultSet r = s.executeQuery("SELECT * FROM Place");
-        while (r.next()) {
-			System.out.println(r.getInt("id")+" "+r.getString("name"));
-		}
-	}
 }
