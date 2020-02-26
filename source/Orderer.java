@@ -30,8 +30,10 @@ public class Orderer {
 		if (amount < 1) {
 			return (-1);
 		} else if (amount == 1) {
-			return(getOrdererID(););
+			this.id = getOrdererID();
+			return(this.id);
 		} else {
+			Scanner input = new Scanner(System.in);
 			System.out.println("Several orderers were found with this name.");
 			System.out.println("Please insert the orderer's id: ");
 			this.id = input.nextInt();
@@ -69,7 +71,7 @@ public class Orderer {
         Scanner input = new Scanner(System.in);
 
         PreparedStatement p = db.prepareStatement("SELECT * FROM Orderer WHERE id=?");
-		p.setString(1,this.id);
+		p.setInt(1,this.id);
 
         ResultSet r = p.executeQuery();
         if (r.next()) {
@@ -77,7 +79,7 @@ public class Orderer {
 			db_fname = r.getString("first_name");
 			db_lname = r.getString("last_name");
 			if (this.first_name == db_fname && this.last_name == db_lname) {
-				System.out.println("The orderer "+this.first_name+" "+this.last_name)+" exists in the database.";
+				System.out.println("The orderer "+this.first_name+" "+this.last_name+" exists in the database.");
 				return(this.id);
 			}
 			else {

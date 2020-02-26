@@ -24,7 +24,7 @@ public class Dashboard {
 	public static void initTable() throws SQLException {
         Connection db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
 		Statement s = db.createStatement();
-        s.execute("CREATE TABLE Parcel (id INTEGER PRIMARY KEY, order_id INTEGER, current_place_id INTEGER, FOREIGN KEY(order_id) REFERENCES Orderer(id), FOREIGN KEY(current_place_id) REFERENCES Place(id))");
+        s.execute("CREATE TABLE Parcel (id STRING PRIMARY KEY, order_id INTEGER, current_place_id INTEGER, FOREIGN KEY(order_id) REFERENCES Orderer(id), FOREIGN KEY(current_place_id) REFERENCES Place(id))");
 		s.execute("CREATE TABLE Orderer (id INTEGER PRIMARY KEY, first_name STRING, last_name STRING)");
 		s.execute("CREATE TABLE Place (id INTEGER PRIMARY KEY, name STRING)");
 		//s.execute("CREATE TABLE Events (id INTEGER PRIMARY KEY, tracing_id INTEGER FOREIGN KEY, place_id INTEGER FOREIGN KEY, event_time (date TEXT), description STRING)");
@@ -140,30 +140,21 @@ public class Dashboard {
 		}
 	}
 
-	public static void queryParcelAll() throws SQLException {
-		Connection db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
-		Statement s = db.createStatement();
-		ResultSet r = s.executeQuery("SELECT * FROM Parcel");
-        while (r.next()) {
-			System.out.println(r.getInt("id")+" "+r.getString("name")+" "+r.getString("name"));
-		}
-	}
-
 	public static void queryOrdererAll() throws SQLException {
 		Connection db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
 		Statement s = db.createStatement();
 		ResultSet r = s.executeQuery("SELECT * FROM Orderer");
         while (r.next()) {
-			System.out.println(r.getInt("id")+" "+r.getString("order_id")+" "+r.getString("current_place_id"));
+			System.out.println(r.getInt("id")+" "+r.getString("first_name")+" "+r.getString("last_name"));
 		}
 	}
-	
-	public static void queryPlaceAll() throws SQLException {
+
+	public static void queryParcelAll() throws SQLException {
 		Connection db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
 		Statement s = db.createStatement();
-		ResultSet r = s.executeQuery("SELECT * FROM Place");
+		ResultSet r = s.executeQuery("SELECT * FROM Parcel");
         while (r.next()) {
-			System.out.println(r.getInt("id")+" "+r.getString("name"));
+			System.out.println(r.getInt("id")+" "+r.getString("order_id")+" "+r.getString("current_place_id"));
 		}
 	}
 
