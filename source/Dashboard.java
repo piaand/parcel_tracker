@@ -6,7 +6,7 @@ public class Dashboard {
 	
 	/*would it be better to create a Dashboar object at the beginning?
 	or continue with the main class and no variations? */
-
+	
 	public static void main(String[] args) throws SQLException {
 		int key;
 
@@ -29,16 +29,6 @@ public class Dashboard {
 		s.execute("CREATE TABLE Place (id INTEGER PRIMARY KEY, name STRING)");
 		//s.execute("CREATE TABLE Events (id INTEGER PRIMARY KEY, tracing_id INTEGER FOREIGN KEY, place_id INTEGER FOREIGN KEY, event_time (date TEXT), description STRING)");
 
-		s.execute("INSERT INTO Parcel (id,order_id,current_place_id) VALUES (10,8,12)");
-
-        ResultSet r = s.executeQuery("SELECT * FROM Orderer");
-        while (r.next()) {
-            System.out.println(r.getInt("id")+" "+r.getString("first_name")+" "+r.getString("last_name"));
-		}
-		ResultSet m = s.executeQuery("SELECT * FROM Parcel");
-		while (m.next()) {
-            System.out.println(m.getInt("id")+" "+m.getInt("order_id")+" "+m.getInt("current_place_id"));
-		}
 	}
 
 	/*public static void insertPlace() throws SQLException {
@@ -78,6 +68,7 @@ public class Dashboard {
 	
 	public static void switchTable(int key) throws SQLException {
 
+		int orderer_id;
 		if (key == 1)
 		{	
 			System.out.println("Creating a database\n");
@@ -102,16 +93,18 @@ public class Dashboard {
 		else if (key == 3)
 		{
 			System.out.println("Add a new orderer\n");
-			Orderer myorder = new Orderer();
-			myorder.insertOrderer();
-			queryOrdererAll();
+			Orderer myorderer = new Orderer();
+			myorderer.insertOrderer();
 		}
 		else if (key == 4)
 		{
 			System.out.println("Add a new parcel\n");
-			Parcel myparcel = new Parcel();
-			myparcel.insertParcel();
-			queryParcelAll();
+			Orderer myorderer = new Orderer();
+			orderer_id = myorderer.inDatabase();
+			if (orderer_id > 0) {
+				Parcel myparcel = new Parcel(orderer_id);
+				myparcel.insertParcel();
+			}
 		}
 		else if (key == 5)
 		{
@@ -165,6 +158,15 @@ public class Dashboard {
 		}
 	}
 	
+	public static void queryPlaceAll() throws SQLException {
+		Connection db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+		Statement s = db.createStatement();
+		ResultSet r = s.executeQuery("SELECT * FROM Place");
+        while (r.next()) {
+			System.out.println(r.getInt("id")+" "+r.getString("name"));
+		}
+	}
+
 	public static void printInstructions() {
 		System.out.println("\n-----------");
 		System.out.println("Press 1 to create a new database");

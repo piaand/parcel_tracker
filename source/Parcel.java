@@ -8,27 +8,30 @@ public class Parcel {
 	public int current_place_id;
 	private static int count = 1;
 	
-	public Parcel() {
+	public Parcel (int orderer_id) {
 		Scanner input = new Scanner(System.in);
-		System.out.println("Enter here the name of the place: ");
-		this.name = input.nextLine();
-		this.id = count++;
+		System.out.println("Enter here the parcel tracking code: ");
+		this.id = input.nextLine();
+		this.order_id = orderer_id;
+		this.current_place_id = NULL; //or should this be 0
 	}
-/* Fix the below - also check would it be possible to mention that there is 2 people under same name and print? */
-	public void printPlace() {
-		System.out.println("Name of the place:"+ name );
-		System.out.println("ID:"+ id );
+
+	public void printParcel() {
+		System.out.println("Parcel id: "+ this.id );
+		System.out.println("From the orderer whos id is "+ this.order_id);
+		System.out.println("This parcel is currently at location "+ this.current_place_id);
 	}
 
 	public void insertPlace() throws SQLException {
 		Connection db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
-		PreparedStatement p = db.prepareStatement("INSERT INTO Place(id,name) VALUES (?,?)");
+		PreparedStatement p = db.prepareStatement("INSERT INTO Parcel(id,order_id,current_place_id) VALUES (?,?,?)");
         p.setInt(1,this.id);
-        p.setString(2,this.name);
+		p.setString(2,this.order_id);
+		p.setString(2,this.current_place_id);
 
         p.executeUpdate();
 		System.out.println("Added the following:");
-		this.printPlace();
+		this.printParcel();
 	}
 
 }

@@ -11,7 +11,7 @@ public class Place {
 		Scanner input = new Scanner(System.in);
 		System.out.println("Enter here the name of the place: ");
 		this.name = input.nextLine();
-		this.id = count++;
+		this.id = count;
 	}
 
 	public void printPlace() {
@@ -28,6 +28,7 @@ public class Place {
         p.executeUpdate();
 		System.out.println("Added the following:");
 		this.printPlace();
+		count++;
 	}
 
 }
