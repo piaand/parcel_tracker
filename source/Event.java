@@ -85,6 +85,7 @@ public class Event {
 			this.printEvent();
 			count++;
 		} catch (Exception e) {
+			System.out.println( e );
 			System.out.println("Error: inserting event failed. Please try again.");
 		} finally {
 			try { p.close(); } catch (Exception e) { /* ignored */ }

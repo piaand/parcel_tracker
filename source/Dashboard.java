@@ -34,9 +34,10 @@ public class Dashboard {
 			s.execute("CREATE TABLE Parcel (id STRING PRIMARY KEY, order_id INTEGER, current_place_id INTEGER, FOREIGN KEY(order_id) REFERENCES Orderer(id), FOREIGN KEY(current_place_id) REFERENCES Place(id))");
 			s.execute("CREATE TABLE Orderer (id INTEGER PRIMARY KEY, first_name STRING, last_name STRING)");
 			s.execute("CREATE TABLE Place (id INTEGER PRIMARY KEY, name STRING UNIQUE)");
-			s.execute("CREATE TABLE Event (id INTEGER PRIMARY KEY, tracing_id INTEGER FOREIGN KEY, place_id INTEGER FOREIGN KEY, event_time (date TEXT), description STRING)");
+			s.execute("CREATE TABLE Event (id INTEGER PRIMARY KEY, tracing_id STRING, place_id INTEGER, event_time STRING, description STRING, FOREIGN KEY(tracing_id) REFERENCES Parcel(id), FOREIGN KEY(place_id) REFERENCES Place(id))");
 		} catch (Exception e) {
-			//TODO: handle exception
+			System.out.print( e );
+			throw e;
 		} finally {
 			try { s.close(); } catch (Exception e) { /* ignored */ }
 			try { db.close(); } catch (Exception e) { /* ignored */ }
@@ -126,7 +127,7 @@ public class Dashboard {
 			if (place_id > 0) {
 				parcel_id = askParcelId();
 				orderer_id = getParcelOrderer(parcel_id);
-				if (orderer_id > 1)
+				if (orderer_id > 0)
 				{
 					Event myevent = new Event(place_id, parcel_id);
 					myevent.insertEvent();
