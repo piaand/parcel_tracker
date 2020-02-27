@@ -140,7 +140,9 @@ public class Dashboard {
 		}
 		else if (key == 6)
 		{
-			System.out.println("fetch all parcel events\n");
+			System.out.println("Fetch all events of a parcel\n");
+			parcel_id = askParcelId();
+			getParcelEvents(parcel_id);
 		}
 		else if (key == 7)
 		{
@@ -197,6 +199,35 @@ public class Dashboard {
 		
 	}
 
+	public static void getParcelEvents(String id) {
+		Connection db = null;
+		PreparedStatement p = null;
+		ResultSet r = null;
+		int count = 0;
+
+		try {
+			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+
+			p = db.prepareStatement("SELECT * FROM Event WHERE tracing_id=?");
+			p.setString(1,id);
+
+			r = p.executeQuery();
+			while (r.next()) {
+				System.out.println("Event id: "+r.getInt("id")+" at place "+r.getInt("place_id")+" happened "+r.getString("event_time")+"\nDescription: "+r.getString("description"));
+				count++;
+			}
+			if (count == 0) {
+				System.out.println("This parcel id has no events in the database.");
+			}
+		} catch (Exception e) {
+			System.out.println("Error: this parcel id found no events.");
+		} finally {
+			try { r.close(); } catch (Exception e) { /* ignored */ }
+    		try { p.close(); } catch (Exception e) { /* ignored */ }
+			try { db.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+
 	public static int getParcelOrderer(String id) {
 		int db_orderid = -1;
 		Connection db = null;
@@ -228,7 +259,7 @@ public class Dashboard {
 		System.out.println("Press 3 to add orderer's information");
 		System.out.println("Press 4 to add a new parcel to be delivered");
 		System.out.println("Press 5 to add a new scanning event for the parcel");
-		System.out.println("Press 6 to fetch all the events of parcel");
+		System.out.println("Press 6 to fetch all the events of a parcel");
 		System.out.println("Press 7 to fetch all the parcels and amount of events of an orderer");
 		System.out.println("Press 8 to fetch the number of events related to a place");
 		System.out.println("Press 9 to exit program");
