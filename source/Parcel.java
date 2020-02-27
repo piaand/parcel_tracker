@@ -22,6 +22,45 @@ public class Parcel {
 		System.out.println("This parcel is currently at location "+ this.current_place_id);
 	}
 
+	public String inDatabase() throws SQLException {
+		String id;
+
+		id = getParcelid();
+		if (id == null) {
+			System.out.println("This parcel is not in the database.");
+			return (null);
+		} else {
+			this.id = id;
+			return(this.id);
+		}
+	}
+
+	public String getParcelid() {
+		String db_id = null;
+		Connection db = null;
+		PreparedStatement p = null;
+		ResultSet r = null;
+
+		try {
+			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+
+			p = db.prepareStatement("SELECT id FROM Parcel WHERE id=?");
+			p.setString(1,this.id);
+
+			r = p.executeQuery();
+			db_id = r.getString("id");
+		} catch (Exception e) {
+			System.out.println("Error: getting Parcel id failed");
+			throw e;
+		} finally {
+			try { r.close(); } catch (Exception e) { /* ignored */ }
+    		try { p.close(); } catch (Exception e) { /* ignored */ }
+			try { db.close(); } catch (Exception e) { /* ignored */ }
+			return (db_id);
+		}
+	}
+
+
 	public void insertParcel() throws SQLException {
 		Connection db = null;
 		PreparedStatement p = null;

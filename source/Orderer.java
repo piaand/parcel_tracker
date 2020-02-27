@@ -28,6 +28,7 @@ public class Orderer {
 
 		amount = getMatchingOrdererAmount();
 		if (amount < 1) {
+			System.out.println("There is no orderer with this name in the database.");
 			return (-1);
 		} else if (amount == 1) {
 			this.id = getOrdererID();
@@ -42,7 +43,6 @@ public class Orderer {
 			{
 				return (found);
 			} else {
-				System.out.println("Please enter a unique orderer name or orderer name with representative id.");
 				return (-1);
 			}
 		}
@@ -56,7 +56,6 @@ public class Orderer {
 
 		try {
 			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
-        	Scanner input = new Scanner(System.in);
 
 			p = db.prepareStatement("SELECT id FROM Orderer WHERE first_name=? AND last_name=?");
 			p.setString(1,this.first_name);
@@ -86,7 +85,6 @@ public class Orderer {
 
 		try {
 			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
-			Scanner input = new Scanner(System.in);
 
 			p = db.prepareStatement("SELECT * FROM Orderer WHERE id=?");
 			p.setInt(1,this.id);
@@ -96,7 +94,7 @@ public class Orderer {
 				System.out.println("ID "+r.getInt("id")+" was found!");
 				db_fname = r.getString("first_name");
 				db_lname = r.getString("last_name");
-				if (this.first_name == db_fname && this.last_name == db_lname) {
+				if (this.first_name.equals(db_fname) && this.last_name.equals(db_lname)) {
 					System.out.println("The orderer "+this.first_name+" "+this.last_name+" exists in the database.");
 					id = this.id;
 				}
@@ -124,7 +122,6 @@ public class Orderer {
 		
 		try {
 			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
-			Scanner input = new Scanner(System.in);
 	
 			p = db.prepareStatement("SELECT COUNT(*) AS rowcount FROM Orderer WHERE first_name=? AND last_name=?");
 			p.setString(1,this.first_name);
@@ -145,7 +142,7 @@ public class Orderer {
 	public void insertOrderer() throws SQLException {
 		Connection db = null;
 		PreparedStatement p = null;
-		
+
 		try {
 			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
 			p = db.prepareStatement("INSERT INTO Orderer(id,first_name,last_name) VALUES (?,?,?)");

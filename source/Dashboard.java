@@ -33,8 +33,8 @@ public class Dashboard {
 			s = db.createStatement();
 			s.execute("CREATE TABLE Parcel (id STRING PRIMARY KEY, order_id INTEGER, current_place_id INTEGER, FOREIGN KEY(order_id) REFERENCES Orderer(id), FOREIGN KEY(current_place_id) REFERENCES Place(id))");
 			s.execute("CREATE TABLE Orderer (id INTEGER PRIMARY KEY, first_name STRING, last_name STRING)");
-			s.execute("CREATE TABLE Place (id INTEGER PRIMARY KEY, name STRING)");
-			//s.execute("CREATE TABLE Events (id INTEGER PRIMARY KEY, tracing_id INTEGER FOREIGN KEY, place_id INTEGER FOREIGN KEY, event_time (date TEXT), description STRING)");
+			s.execute("CREATE TABLE Place (id INTEGER PRIMARY KEY, name STRING UNIQUE)");
+			s.execute("CREATE TABLE Event (id INTEGER PRIMARY KEY, tracing_id INTEGER FOREIGN KEY, place_id INTEGER FOREIGN KEY, event_time (date TEXT), description STRING)");
 		} catch (Exception e) {
 			//TODO: handle exception
 		} finally {
@@ -45,24 +45,10 @@ public class Dashboard {
 
 	}
 
-	/*public static void insertPlace() throws SQLException {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-		String ts = sdf.format(timestamp);
-		s.execute("INSERT INTO Events (id,tracing_id,place_id,event_time,description) VALUES (7, 70001, 3, ?, 'we describe her')"); {
-        	s.setString(1, ts);
-		}
-
-		ResultSet m = ps.executeQuery("SELECT * FROM Events");
-        while (m.next()) {
-            System.out.println(m.getInt("id")+" "+m.getInt("tracing_id")+" "+m.getInt("place_id")+" "+m.getString("event_time")+" "+m.getString("description"));
-		}
-	}*/
-
 	public static int askNextStep() {
 		int key;
 		boolean inList;
-		List<Integer> instructions = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9);
+		List<Integer> instructions = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 		Scanner input = new Scanner(System.in);  // Create a Scanner object
 		
 		System.out.print("What to do next?: ");
@@ -75,14 +61,24 @@ public class Dashboard {
 			System.out.println("Nope! Try again: ");
 			key = input.nextInt();
 		}
-		input = null;
 		return (key);
+	}
+
+	public static String askParcelId() {
+		String id;
+		Scanner input = new Scanner(System.in);  // Create a Scanner object
+		
+		System.out.print("Enter the parcel tracking id: ");
+		id = input.nextLine();
+		return (id);
 	}
 
 	
 	public static void switchTable(int key) throws SQLException {
 
 		int orderer_id;
+		int place_id;
+		String parcel_id;
 		if (key == 1)
 		{	
 			System.out.println("Creating a database\n");
@@ -118,11 +114,28 @@ public class Dashboard {
 			if (orderer_id > 0) {
 				Parcel myparcel = new Parcel(orderer_id);
 				myparcel.insertParcel();
+			} else {
+				System.out.println("Please enter a unique orderer name or orderer name with representative id.");
 			}
 		}
 		else if (key == 5)
 		{
-			System.out.println("add a new event\n");
+			System.out.println("Add a new event\n");
+			Place myplace = new Place();
+			place_id = myplace.inDatabase();
+			if (place_id > 0) {
+				parcel_id = askParcelId();
+				orderer_id = getParcelOrderer(parcel_id);
+				if (orderer_id > 1)
+				{
+					Event myevent = new Event(place_id, parcel_id);
+					myevent.insertEvent();
+				} else {
+					System.out.println("This parcel is not in the database.");
+				}
+			} else {
+				System.out.println("This place is not in the database.");
+			}
 		}
 		else if (key == 6)
 		{
@@ -140,7 +153,7 @@ public class Dashboard {
 		{
 			System.out.println("Doing performance tests\n");
 		}
-		else
+		else if (key == 9)
 		{
 			System.out.println("Byebye! System closes now\n");
 		}
@@ -168,7 +181,7 @@ public class Dashboard {
 			} else if (table_name == "Parcel") {
 				r = s.executeQuery("SELECT * FROM Parcel");
 				while (r.next()) {
-					System.out.println(r.getInt("id")+" "+r.getString("order_id")+" "+r.getString("current_place_id"));
+					System.out.println(r.getString("id")+" "+r.getInt("order_id")+" "+r.getInt("current_place_id"));
 				}
 			} else {
 				// pass
@@ -181,6 +194,30 @@ public class Dashboard {
 			try { db.close(); } catch (Exception e) { /* ignored */ }
 		}
 		
+	}
+
+	public static int getParcelOrderer(String id) {
+		int db_orderid = -1;
+		Connection db = null;
+		PreparedStatement p = null;
+		ResultSet r = null;
+
+		try {
+			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+
+			p = db.prepareStatement("SELECT * FROM Parcel WHERE id=?");
+			p.setString(1,id);
+
+			r = p.executeQuery();
+			db_orderid = r.getInt("order_id");
+		} catch (Exception e) {
+			System.out.println("Error: this parcel id found no orderer id.");
+		} finally {
+			try { r.close(); } catch (Exception e) { /* ignored */ }
+    		try { p.close(); } catch (Exception e) { /* ignored */ }
+			try { db.close(); } catch (Exception e) { /* ignored */ }
+			return (db_orderid);
+		}
 	}
 
 	public static void printInstructions() {
