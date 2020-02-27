@@ -23,15 +23,25 @@ public class Parcel {
 	}
 
 	public void insertParcel() throws SQLException {
-		Connection db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
-		PreparedStatement p = db.prepareStatement("INSERT INTO Parcel(id,order_id,current_place_id) VALUES (?,?,?)");
-        p.setString(1,this.id);
-		p.setInt(2,this.order_id);
-		p.setInt(3,this.current_place_id);
+		Connection db = null;
+		PreparedStatement p = null;
 
-        p.executeUpdate();
-		System.out.println("Added the following:");
-		this.printParcel();
+		try {
+			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+			p = db.prepareStatement("INSERT INTO Parcel(id,order_id,current_place_id) VALUES (?,?,?)");
+			p.setString(1,this.id);
+			p.setInt(2,this.order_id);
+			p.setInt(3,this.current_place_id);
+
+			p.executeUpdate();
+			System.out.println("Added the following:");
+			this.printParcel();
+		} catch (Exception e) {
+			//TODO: handle exception
+		} finally {
+			try { p.close(); } catch (Exception e) { /* ignored */ }
+    		try { db.close(); } catch (Exception e) { /* ignored */ }
+		}
 	}
 
 }

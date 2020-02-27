@@ -17,20 +17,31 @@ public class Dashboard {
 			printInstructions();
 			key = askNextStep();
 			switchTable(key);
-			queryPlaceAll();
-			queryOrdererAll();
-			queryParcelAll();
+			queryAll("Place");
+			queryAll("Orderer");
+			queryAll("Parcel");
 		}
 
 	}
 	
 	public static void initTable() throws SQLException {
-        Connection db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
-		Statement s = db.createStatement();
-        s.execute("CREATE TABLE Parcel (id STRING PRIMARY KEY, order_id INTEGER, current_place_id INTEGER, FOREIGN KEY(order_id) REFERENCES Orderer(id), FOREIGN KEY(current_place_id) REFERENCES Place(id))");
-		s.execute("CREATE TABLE Orderer (id INTEGER PRIMARY KEY, first_name STRING, last_name STRING)");
-		s.execute("CREATE TABLE Place (id INTEGER PRIMARY KEY, name STRING)");
-		//s.execute("CREATE TABLE Events (id INTEGER PRIMARY KEY, tracing_id INTEGER FOREIGN KEY, place_id INTEGER FOREIGN KEY, event_time (date TEXT), description STRING)");
+		Connection db = null;
+		Statement s = null;
+
+		try {
+			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+			s = db.createStatement();
+			s.execute("CREATE TABLE Parcel (id STRING PRIMARY KEY, order_id INTEGER, current_place_id INTEGER, FOREIGN KEY(order_id) REFERENCES Orderer(id), FOREIGN KEY(current_place_id) REFERENCES Place(id))");
+			s.execute("CREATE TABLE Orderer (id INTEGER PRIMARY KEY, first_name STRING, last_name STRING)");
+			s.execute("CREATE TABLE Place (id INTEGER PRIMARY KEY, name STRING)");
+			//s.execute("CREATE TABLE Events (id INTEGER PRIMARY KEY, tracing_id INTEGER FOREIGN KEY, place_id INTEGER FOREIGN KEY, event_time (date TEXT), description STRING)");
+		} catch (Exception e) {
+			//TODO: handle exception
+		} finally {
+			try { s.close(); } catch (Exception e) { /* ignored */ }
+			try { db.close(); } catch (Exception e) { /* ignored */ }
+		}
+        
 
 	}
 
@@ -79,7 +90,7 @@ public class Dashboard {
 				initTable();	
 			} catch (Exception e) {
 				System.out.println( e );
-				System.out.println("Creating database didn't succeed - exiting program.\n");
+				System.out.println("Error: Creating database didn't succeed - exiting program.\n");
 				throw e;
 			}
 		}
@@ -90,7 +101,7 @@ public class Dashboard {
 				Place myplace = new Place();
 				myplace.insertPlace();
 			} catch (Exception e) {
-				System.out.println("Adding a new place to database didn't succeed - please try agin.\n");
+				System.out.println("Error: Adding a new place to database didn't succeed - please try agin.\n");
 			}
 		}
 		else if (key == 3)
@@ -135,31 +146,41 @@ public class Dashboard {
 		}
 	}
 	
-	public static void queryPlaceAll() throws SQLException {
-		Connection db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
-		Statement s = db.createStatement();
-		ResultSet r = s.executeQuery("SELECT * FROM Place");
-        while (r.next()) {
-			System.out.println(r.getInt("id")+" "+r.getString("name"));
-		}
-	}
+	
+	public static void queryAll(String table_name) throws SQLException {
+		Connection db = null;
+		Statement s = null;
+		ResultSet r = null;
 
-	public static void queryOrdererAll() throws SQLException {
-		Connection db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
-		Statement s = db.createStatement();
-		ResultSet r = s.executeQuery("SELECT * FROM Orderer");
-        while (r.next()) {
-			System.out.println(r.getInt("id")+" "+r.getString("first_name")+" "+r.getString("last_name"));
+		try {
+			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+			s = db.createStatement();
+			if (table_name == "Place") {
+				r = s.executeQuery("SELECT * FROM Place");
+				while (r.next()) {
+					System.out.println(r.getInt("id")+" "+r.getString("name"));
+				}
+			} else if (table_name == "Orderer") {
+				r = s.executeQuery("SELECT * FROM Orderer");
+				while (r.next()) {
+					System.out.println(r.getInt("id")+" "+r.getString("first_name")+" "+r.getString("last_name"));
+				}
+			} else if (table_name == "Parcel") {
+				r = s.executeQuery("SELECT * FROM Parcel");
+				while (r.next()) {
+					System.out.println(r.getInt("id")+" "+r.getString("order_id")+" "+r.getString("current_place_id"));
+				}
+			} else {
+				// pass
+			}
+		} catch (Exception e) {
+			//TODO: handle exception
+		} finally {
+			try { r.close(); } catch (Exception e) { /* ignored */ }
+			try { s.close(); } catch (Exception e) { /* ignored */ }
+			try { db.close(); } catch (Exception e) { /* ignored */ }
 		}
-	}
-
-	public static void queryParcelAll() throws SQLException {
-		Connection db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
-		Statement s = db.createStatement();
-		ResultSet r = s.executeQuery("SELECT * FROM Parcel");
-        while (r.next()) {
-			System.out.println(r.getInt("id")+" "+r.getString("order_id")+" "+r.getString("current_place_id"));
-		}
+		
 	}
 
 	public static void printInstructions() {

@@ -20,15 +20,25 @@ public class Place {
 	}
 
 	public void insertPlace() throws SQLException {
-		Connection db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
-		PreparedStatement p = db.prepareStatement("INSERT INTO Place(id,name) VALUES (?,?)");
-        p.setInt(1,this.id);
-        p.setString(2,this.name);
+		Connection db = null;
+		PreparedStatement p = null;
+		try {
+			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+			p = db.prepareStatement("INSERT INTO Place(id,name) VALUES (?,?)");
+			p.setInt(1,this.id);
+			p.setString(2,this.name);
 
-        p.executeUpdate();
-		System.out.println("Added the following:");
-		this.printPlace();
-		count++;
+			p.executeUpdate();
+			System.out.println("Added the following:");
+			this.printPlace();
+			count++;
+		} catch (Exception e) {
+			//TODO: handle exception
+		} finally {
+			try { p.close(); } catch (Exception e) { /* ignored */ }
+			try { db.close(); } catch (Exception e) { /* ignored */ }
+		}
+		
 	}
 
 }
