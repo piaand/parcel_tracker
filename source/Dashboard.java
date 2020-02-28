@@ -146,7 +146,14 @@ public class Dashboard {
 		}
 		else if (key == 7)
 		{
-			System.out.println("fetch  all parcels of the orderer\n");
+			System.out.println("Fetch amount events of all parcels of the orderer\n");
+			Orderer myorderer = new Orderer();
+			orderer_id = myorderer.inDatabase();
+			if (orderer_id > 0) {
+				myorderer.getParcelIDs(orderer_id);
+			} else {
+				System.out.println("Please enter a unique orderer name or orderer name with representative id.");
+			}
 		}
 		else if (key == 8)
 		{

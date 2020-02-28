@@ -139,6 +139,37 @@ public class Orderer {
 		}
 	}
 
+
+	public void getParcelIDs(int orderer_id) throws SQLException {
+		Connection db = null;
+		PreparedStatement p = null;
+		ResultSet r = null;
+		this.id = orderer_id;
+		int count = 0;
+
+		 try {
+			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+			p = db.prepareStatement("SELECT b, COUNT(id) AS event_count FROM (SELECT id AS b FROM Parcel WHERE order_id=?) LEFT JOIN Event ON b=tracing_id GROUP BY b");
+			p.setInt(1,this.id);
+	
+			r = p.executeQuery();
+			while (r.next()) {
+				System.out.println("Parcel: "+r.getString("b")+" has "+r.getInt("event_count")+" events");
+				count++;
+			}
+			if (count == 0) {
+				System.out.println("This orderer has no parcels in the system.");
+			}
+		 } catch (Exception e) {
+			 throw e;
+		 } finally {
+			try { r.close(); } catch (Exception e) { /* ignored */ }
+			try { p.close(); } catch (Exception e) { /* ignored */ }
+			try { db.close(); } catch (Exception e) { /* ignored */ }
+			//return (parcel_ids);
+		 }
+	}
+
 	public void insertOrderer() throws SQLException {
 		Connection db = null;
 		PreparedStatement p = null;
@@ -149,9 +180,6 @@ public class Orderer {
 			p.setInt(1,this.id);
 			p.setString(2,this.first_name);
 			p.setString(3,this.last_name);
-			//print out this.id, this.name values before executing sql - this fails now
-			// might be because i dont close connection - do db.close after every use https://bukkit.org/threads/sqlite-the-database-file-is-locked.139372/
-			// google singleton class
 
 			p.executeUpdate();
 			System.out.println("Added the following:");
@@ -165,5 +193,4 @@ public class Orderer {
 		}
 		
 	}
-
 }
