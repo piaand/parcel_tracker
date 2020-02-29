@@ -67,19 +67,28 @@ public class Dashboard {
 
 	public static String askParcelId() {
 		String id;
-		Scanner input = new Scanner(System.in);  // Create a Scanner object
+		Scanner input = new Scanner(System.in);
 		
 		System.out.print("Enter the parcel tracking id: ");
 		id = input.nextLine();
 		return (id);
 	}
 
+	public static String askDate() {
+		String date;
+		Scanner input = new Scanner(System.in);
+
+		System.out.print("Enter the date with the format yyyy-mm-dd: ");
+		date = input.nextLine();
+		return (date);
+	}
+
 	
 	public static void switchTable(int key) throws SQLException {
-
 		int orderer_id;
 		int place_id;
 		String parcel_id;
+		String date;
 		if (key == 1)
 		{	
 			System.out.println("Creating a database\n");
@@ -157,7 +166,16 @@ public class Dashboard {
 		}
 		else if (key == 8)
 		{
-			System.out.println("fetch nnumber of events related to av place\n");
+			System.out.println("Fetch amount events at a place on a date\n");
+			Place myplace = new Place();
+			place_id = myplace.inDatabase();
+			if (place_id > 0) {
+				date = askDate();
+				myplace.fetchEvents(date);
+			} else {
+				System.out.println("This place is not in the database.");
+			}
+			// https://stackoverflow.com/questions/8247970/using-like-wildcard-in-prepared-statement
 		}
 		else if (key == 10)
 		{

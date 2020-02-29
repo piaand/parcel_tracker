@@ -57,6 +57,40 @@ public class Place {
 		}
 	}
 
+	public void fetchEvents(String date) throws SQLException {
+		Connection db = null;
+		PreparedStatement p = null;
+		ResultSet r = null;
+		int count = 0;
+
+		date = date.replace("!", "!!")
+		.replace("%", "!%")
+		.replace("_", "!_")
+		.replace("[", "![");
+
+		 try {
+			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+			p = db.prepareStatement("SELECT b, name, COUNT(id) AS event_count FROM (SELECT id AS b, name FROM Place WHERE id=?) LEFT JOIN (SELECT id, place_id FROM Event WHERE event_time LIKE ? ESCAPE '!') ON b=place_id GROUP BY b");
+			p.setInt(1,this.id);
+			p.setString(2, date + "%");
+	
+			r = p.executeQuery();
+			while (r.next()) {
+				System.out.println("Place: "+r.getString("name")+" has "+r.getInt("event_count")+" events");
+				count++;
+			}
+			if (count == 0) {
+				System.out.println("This place has no scanning events on the date "+date+" in the system.");
+			}
+		 } catch (Exception e) {
+			 throw e;
+		 } finally {
+			try { r.close(); } catch (Exception e) { /* ignored */ }
+			try { p.close(); } catch (Exception e) { /* ignored */ }
+			try { db.close(); } catch (Exception e) { /* ignored */ }
+		 }
+	}
+
 	public void insertPlace() throws SQLException {
 		Connection db = null;
 		PreparedStatement p = null;

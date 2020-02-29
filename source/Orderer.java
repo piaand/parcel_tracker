@@ -166,7 +166,6 @@ public class Orderer {
 			try { r.close(); } catch (Exception e) { /* ignored */ }
 			try { p.close(); } catch (Exception e) { /* ignored */ }
 			try { db.close(); } catch (Exception e) { /* ignored */ }
-			//return (parcel_ids);
 		 }
 	}
 
