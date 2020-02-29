@@ -1,5 +1,5 @@
 import java.util.*; 
-import java.sql.*; // Impport Java sql package
+import java.sql.*;
 
 public class Orderer {
 	
@@ -105,7 +105,7 @@ public class Orderer {
 				System.out.println("This ID represents no orderer in the database.");
 			}
 		} catch (Exception e) {
-			//TODO: handle exception
+			System.out.println("Error: checking orderer id faced an exception. Please try again.");
 		} finally {
 			try { r.close(); } catch (Exception e) { /* ignored */ }
 			try { p.close(); } catch (Exception e) { /* ignored */ }
@@ -130,7 +130,7 @@ public class Orderer {
 			r = p.executeQuery();
 			row_nb = r.getInt("rowcount");	
 		} catch (Exception e) {
-			//TODO: handle exception
+			System.out.println("Error: finding orderer with name faced an exception. Please try again.");
 		} finally {
 			try { r.close(); } catch (Exception e) { /* ignored */ }
 			try { p.close(); } catch (Exception e) { /* ignored */ }
@@ -161,7 +161,7 @@ public class Orderer {
 				System.out.println("This orderer has no parcels in the system.");
 			}
 		 } catch (Exception e) {
-			 throw e;
+			System.out.println("Error: getting parcels from orderer faced an exception. Please try again.");
 		 } finally {
 			try { r.close(); } catch (Exception e) { /* ignored */ }
 			try { p.close(); } catch (Exception e) { /* ignored */ }
@@ -185,7 +185,7 @@ public class Orderer {
 			this.printOrderer();
 			count++;
 		} catch (Exception e) {
-			//TODO: handle exception
+			System.out.println("Error: inserting orderer faced an exception. Please try again.");
 		} finally {
 			try { p.close(); } catch (Exception e) { /* ignored */ }
 			try { db.close(); } catch (Exception e) { /* ignored */ }

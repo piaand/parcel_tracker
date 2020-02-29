@@ -1,11 +1,8 @@
 import java.text.*;
-import java.util.*;  // Import utilities like Scanner, lists etc.
-import java.sql.*; // Impporta Java sql package
+import java.util.*;
+import java.sql.*;
 
 public class Dashboard {
-	
-	/*would it be better to create a Dashboar object at the beginning?
-	or continue with the main class and no variations? */
 	
 	public static void main(String[] args) throws SQLException {
 		int key;
@@ -42,7 +39,7 @@ public class Dashboard {
 				//pass
 			}
 		} catch (Exception e) {
-			System.out.print( e );
+			System.out.print("Error: Creating tables failed - program exits.");
 			throw e;
 		} finally {
 			try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -56,15 +53,12 @@ public class Dashboard {
 		int key;
 		boolean inList;
 		List<Integer> instructions = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-		Scanner input = new Scanner(System.in);  // Create a Scanner object
+		Scanner input = new Scanner(System.in);
 		
 		System.out.print("What to do next?: ");
 		key = input.nextInt();
 		while (!(inList = instructions.contains(key)))
 		{
-			/* this works only with the integers - 
-			no exception thrown when one tries to add anytthing else
-			also beyond max int/min int causes issues*/
 			System.out.println("Nope! Try again: ");
 			key = input.nextInt();
 		}
@@ -241,7 +235,7 @@ public class Dashboard {
 				// pass
 			}
 		} catch (Exception e) {
-			//TODO: handle exception
+			System.out.println("Error: querying tables faced an exception. Please try again.");
 		} finally {
 			try { r.close(); } catch (Exception e) { /* ignored */ }
 			try { s.close(); } catch (Exception e) { /* ignored */ }

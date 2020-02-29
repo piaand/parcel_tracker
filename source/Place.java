@@ -1,5 +1,5 @@
 import java.util.*; 
-import java.sql.*; // Impporta Java sql package
+import java.sql.*;
 
 public class Place {
 	
@@ -83,7 +83,7 @@ public class Place {
 				System.out.println("This place has no scanning events on the date "+date+" in the system.");
 			}
 		 } catch (Exception e) {
-			 throw e;
+			System.out.println("Error: Failed to fetch event amounts. Please try again.");
 		 } finally {
 			try { r.close(); } catch (Exception e) { /* ignored */ }
 			try { p.close(); } catch (Exception e) { /* ignored */ }

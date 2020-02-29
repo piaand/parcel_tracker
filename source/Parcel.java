@@ -72,7 +72,7 @@ public class Parcel {
 			System.out.println("Added the following:");
 			this.printParcel();
 		} catch (Exception e) {
-			//TODO: handle exception
+			System.out.println("Error: inserting parcel data faced an exception. Please try again.");
 		} finally {
 			try { p.close(); } catch (Exception e) { /* ignored */ }
     		try { db.close(); } catch (Exception e) { /* ignored */ }

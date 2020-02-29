@@ -21,18 +21,7 @@ public class Ptest {
 		this.torderer = createOrderers(torderer);
 		this.tparcel = createParcels(tparcel, torderer);
 		this.tevent = createEvents(tevent, tparcel, tplace);
-		/*tplace.forEach(testplace -> {
-			System.out.println("Name: "+testplace.getName()+", id: "+testplace.getID());
-		});
-		torderer.forEach(testo -> {
-			System.out.println("Name: "+testo.getName()+", id: "+testo.getID());
-		});
-		tparcel.forEach(testpar -> {
-			System.out.println("Name: "+testpar.getTrackID()+", id: "+testpar.getOrderer());
-		});
-		tevent.forEach(testev -> {
-			System.out.println("ID: "+testev.getID()+", place: "+testev.getPlaceID()+", parcel: "+testev.getParcelID());
-		});*/
+		
 	}
 	private void measureTime(long start, String mssg) {
 		long stop = System.nanoTime();
@@ -62,7 +51,7 @@ public class Ptest {
 			}
 			measureTime(start, "query amounts of orderers' parcels");
 		 } catch (Exception e) {
-			 throw e;
+			System.out.println("Error: performace test faced an exception. Please try again.");
 		 } finally {
 			try { p.close(); } catch (Exception e) { /* ignored */ }
 			try { db.close(); } catch (Exception e) { /* ignored */ }
@@ -90,7 +79,7 @@ public class Ptest {
 			}
 			measureTime(start, "query event amounts of parcels");
 		 } catch (Exception e) {
-			 throw e;
+			System.out.println("Error: performace test faced an exception. Please try again.");
 		 } finally {
 			try { p.close(); } catch (Exception e) { /* ignored */ }
 			try { db.close(); } catch (Exception e) { /* ignored */ }
@@ -190,7 +179,6 @@ public class Ptest {
 			db.commit();
 		} catch (Exception e) {
 			System.out.println("Error: inserting places in perfromance test failed.");
-			throw e;
 		} finally {
 			try { p1.close(); } catch (Exception e) { /* ignored */ }
 			try { p2.close(); } catch (Exception e) { /* ignored */ }
