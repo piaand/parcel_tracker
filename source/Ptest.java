@@ -41,6 +41,62 @@ public class Ptest {
 		System.out.println(nanos+" nanoseconds or "+elapsed+" seconds to "+mssg);
 	}
 
+	public void queryParcels(String table_name) throws SQLException {
+		Random rand = new Random();
+		long start = 0;
+		Connection db = null;
+		PreparedStatement p = null;
+		int id = 0;
+		int count = 0;
+		int queries = 1000;
+
+		 try {
+			db = DriverManager.getConnection(table_name);
+			p = db.prepareStatement("SELECT COUNT(b) AS parcel_count FROM (SELECT Parcel.id AS b, Orderer.id AS c FROM Orderer LEFT JOIN Parcel ON Parcel.order_id=Orderer.id) WHERE c=?");
+			start = System.nanoTime();
+			while (count < queries) {
+				id = torderer.get(rand.nextInt(torderer.size())).getID();
+				p.setInt(1,id);
+				p.executeQuery();
+				count++;
+			}
+			measureTime(start, "query amounts of orderers' parcels");
+		 } catch (Exception e) {
+			 throw e;
+		 } finally {
+			try { p.close(); } catch (Exception e) { /* ignored */ }
+			try { db.close(); } catch (Exception e) { /* ignored */ }
+		 }
+	}
+
+	public void queryEvents(String table_name) throws SQLException {
+		Random rand = new Random();
+		long start = 0;
+		Connection db = null;
+		PreparedStatement p = null;
+		String id = null;
+		int count = 0;
+		int queries = 1000;
+
+		 try {
+			db = DriverManager.getConnection(table_name);
+			p = db.prepareStatement("SELECT COUNT(b) AS event_count FROM (SELECT Event.id AS b, Parcel.id AS c FROM Parcel LEFT JOIN Event ON Parcel.id=Event.tracing_id) WHERE c=?");
+			start = System.nanoTime();
+			while (count < queries) {
+				id = tparcel.get(rand.nextInt(tparcel.size())).getTrackID();
+				p.setString(1,id);
+				p.executeQuery();
+				count++;
+			}
+			measureTime(start, "query event amounts of parcels");
+		 } catch (Exception e) {
+			 throw e;
+		 } finally {
+			try { p.close(); } catch (Exception e) { /* ignored */ }
+			try { db.close(); } catch (Exception e) { /* ignored */ }
+		 }
+	}
+
 	public void addTestData(String table_name) throws SQLException {
 		long start = 0;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -81,7 +137,7 @@ public class Ptest {
 				p1.executeUpdate();
 				i++;
 			}
-			measureTime(start, "to insert places");
+			measureTime(start, "insert places");
 
 			start = System.nanoTime();
 			i = 0;
@@ -96,7 +152,7 @@ public class Ptest {
 				p2.executeUpdate();
 				i++;
 			}
-			measureTime(start, "to insert orderers");
+			measureTime(start, "insert orderers");
 			
 			start = System.nanoTime();
 			i = 0;
@@ -109,7 +165,7 @@ public class Ptest {
 				p3.executeUpdate();
 				i++;
 			}
-			measureTime(start, "to insert parcels");
+			measureTime(start, "insert parcels");
 			
 			start = System.nanoTime();
 			i = 0;
@@ -129,7 +185,7 @@ public class Ptest {
 				p4.executeUpdate();
 				i++;
 			}
-			measureTime(start, "to insert events");
+			measureTime(start, "insert events");
 			
 			db.commit();
 		} catch (Exception e) {

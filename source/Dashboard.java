@@ -24,7 +24,7 @@ public class Dashboard {
 
 	}
 	
-	public static void initTable(String db_name) throws SQLException {
+	public static void initTable(String db_name, int index) throws SQLException {
 		Connection db = null;
 		Statement s = null;
 
@@ -35,6 +35,12 @@ public class Dashboard {
 			s.execute("CREATE TABLE Orderer (id INTEGER PRIMARY KEY, first_name STRING, last_name STRING)");
 			s.execute("CREATE TABLE Place (id INTEGER PRIMARY KEY, name STRING UNIQUE)");
 			s.execute("CREATE TABLE Event (id INTEGER PRIMARY KEY, tracing_id STRING, place_id INTEGER, event_time STRING, description STRING, FOREIGN KEY(tracing_id) REFERENCES Parcel(id), FOREIGN KEY(place_id) REFERENCES Place(id))");
+			if (index == 1) {
+				s.execute("CREATE INDEX e_parcel_index ON Event(tracing_id)");
+				s.execute("CREATE INDEX p_orderer_index ON Parcel(order_id)");
+			} else {
+				//pass
+			}
 		} catch (Exception e) {
 			System.out.print( e );
 			throw e;
@@ -87,6 +93,7 @@ public class Dashboard {
 	public static void switchTable(int key) throws SQLException {
 		int orderer_id;
 		int place_id;
+		int index;
 		String parcel_id;
 		String date;
 		String table_name;
@@ -95,7 +102,7 @@ public class Dashboard {
 			System.out.println("Creating a database\n");
 			try {
 				table_name = "jdbc:sqlite:parcels.db";
-				initTable(table_name);	
+				initTable(table_name, 0);	
 			} catch (Exception e) {
 				System.out.println( e );
 				System.out.println("Error: Creating database didn't succeed - exiting program.\n");
@@ -180,14 +187,25 @@ public class Dashboard {
 		}
 		else if (key == 10)
 		{
+			Scanner input = new Scanner(System.in);
 			System.out.println("Doing performance tests\n");
+			System.out.print("Press 0 to run test without index and 1 to run with index: ");
+			index = input.nextInt();
 			Ptest mytest = new Ptest();
 			table_name = "jdbc:sqlite:performancetest.db";
-			initTable(table_name);
-			mytest.addTestData(table_name);
-			queryAll(table_name, "Parcel");
-			//mytest.queryParcels(table_name);
-			//mytest.queryEvents(table_name);
+			if (index == 0) {
+				initTable(table_name, index);
+				mytest.addTestData(table_name);
+				mytest.queryParcels(table_name);
+				mytest.queryEvents(table_name);
+			} else if (index == 1) {
+				initTable(table_name, index);
+				mytest.addTestData(table_name);
+				mytest.queryParcels(table_name);
+				mytest.queryEvents(table_name);
+			} else {
+				System.out.println("Press either 1 or 0.\n");
+			}
 		}
 		else if (key == 9)
 		{
