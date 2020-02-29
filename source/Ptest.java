@@ -34,8 +34,15 @@ public class Ptest {
 			System.out.println("ID: "+testev.getID()+", place: "+testev.getPlaceID()+", parcel: "+testev.getParcelID());
 		});*/
 	}
+	private void measureTime(long start, String mssg) {
+		long stop = System.nanoTime();
+		long nanos = stop - start;
+		double elapsed = (double) nanos/1000000000;
+		System.out.println(nanos+" nanoseconds or "+elapsed+" seconds to "+mssg);
+	}
 
 	public void addTestData(String table_name) throws SQLException {
+		long start = 0;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Timestamp timestamp = null;
 		String ts = null;
@@ -63,6 +70,7 @@ public class Ptest {
 		try {
 			db = DriverManager.getConnection(table_name);
 			db.setAutoCommit(false);
+			start = System.nanoTime();
 			p1 = db.prepareStatement("INSERT INTO Place(id,name) VALUES (?,?)");
 			
 			while (i < len_place) {
@@ -73,6 +81,9 @@ public class Ptest {
 				p1.executeUpdate();
 				i++;
 			}
+			measureTime(start, "to insert places");
+
+			start = System.nanoTime();
 			i = 0;
 			p2 = db.prepareStatement("INSERT INTO Orderer(id,first_name,last_name) VALUES (?,?,?)");
 			while (i < len_orderer) {
@@ -85,6 +96,9 @@ public class Ptest {
 				p2.executeUpdate();
 				i++;
 			}
+			measureTime(start, "to insert orderers");
+			
+			start = System.nanoTime();
 			i = 0;
 			p3 = db.prepareStatement("INSERT INTO Parcel(id,order_id) VALUES (?,?)");
 			while (i < len_parcel) {
@@ -95,6 +109,9 @@ public class Ptest {
 				p3.executeUpdate();
 				i++;
 			}
+			measureTime(start, "to insert parcels");
+			
+			start = System.nanoTime();
 			i = 0;
 			p4 = db.prepareStatement("INSERT INTO Event(id,tracing_id,place_id,event_time,description) VALUES (?,?,?,?,?)");
 			while (i < len_event) {
@@ -112,6 +129,8 @@ public class Ptest {
 				p4.executeUpdate();
 				i++;
 			}
+			measureTime(start, "to insert events");
+			
 			db.commit();
 		} catch (Exception e) {
 			System.out.println("Error: inserting places in perfromance test failed.");
