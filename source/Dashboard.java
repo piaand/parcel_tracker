@@ -17,21 +17,21 @@ public class Dashboard {
 			printInstructions();
 			key = askNextStep();
 			switchTable(key);
-			queryAll("Place");
-			queryAll("Orderer");
-			queryAll("Parcel");
+			queryAll("jdbc:sqlite:parcels.db", "Place");
+			queryAll("jdbc:sqlite:parcels.db", "Orderer");
+			queryAll("jdbc:sqlite:parcels.db", "Parcel");
 		}
 
 	}
 	
-	public static void initTable() throws SQLException {
+	public static void initTable(String db_name) throws SQLException {
 		Connection db = null;
 		Statement s = null;
 
 		try {
-			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+			db = DriverManager.getConnection(db_name);
 			s = db.createStatement();
-			s.execute("CREATE TABLE Parcel (id STRING PRIMARY KEY, order_id INTEGER, current_place_id INTEGER, FOREIGN KEY(order_id) REFERENCES Orderer(id), FOREIGN KEY(current_place_id) REFERENCES Place(id))");
+			s.execute("CREATE TABLE Parcel (id STRING PRIMARY KEY, order_id INTEGER, FOREIGN KEY(order_id) REFERENCES Orderer(id))");
 			s.execute("CREATE TABLE Orderer (id INTEGER PRIMARY KEY, first_name STRING, last_name STRING)");
 			s.execute("CREATE TABLE Place (id INTEGER PRIMARY KEY, name STRING UNIQUE)");
 			s.execute("CREATE TABLE Event (id INTEGER PRIMARY KEY, tracing_id STRING, place_id INTEGER, event_time STRING, description STRING, FOREIGN KEY(tracing_id) REFERENCES Parcel(id), FOREIGN KEY(place_id) REFERENCES Place(id))");
@@ -89,11 +89,13 @@ public class Dashboard {
 		int place_id;
 		String parcel_id;
 		String date;
+		String table_name;
 		if (key == 1)
 		{	
 			System.out.println("Creating a database\n");
 			try {
-				initTable();	
+				table_name = "jdbc:sqlite:parcels.db";
+				initTable(table_name);	
 			} catch (Exception e) {
 				System.out.println( e );
 				System.out.println("Error: Creating database didn't succeed - exiting program.\n");
@@ -175,11 +177,17 @@ public class Dashboard {
 			} else {
 				System.out.println("This place is not in the database.");
 			}
-			// https://stackoverflow.com/questions/8247970/using-like-wildcard-in-prepared-statement
 		}
 		else if (key == 10)
 		{
 			System.out.println("Doing performance tests\n");
+			Ptest mytest = new Ptest();
+			table_name = "jdbc:sqlite:performancetest.db";
+			initTable(table_name);
+			mytest.addTestData(table_name);
+			queryAll(table_name, "Parcel");
+			//mytest.queryParcels(table_name);
+			//mytest.queryEvents(table_name);
 		}
 		else if (key == 9)
 		{
@@ -188,13 +196,13 @@ public class Dashboard {
 	}
 	
 	
-	public static void queryAll(String table_name) throws SQLException {
+	public static void queryAll(String db_name, String table_name) throws SQLException {
 		Connection db = null;
 		Statement s = null;
 		ResultSet r = null;
 
 		try {
-			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+			db = DriverManager.getConnection(db_name);
 			s = db.createStatement();
 			if (table_name == "Place") {
 				r = s.executeQuery("SELECT * FROM Place");
@@ -209,7 +217,7 @@ public class Dashboard {
 			} else if (table_name == "Parcel") {
 				r = s.executeQuery("SELECT * FROM Parcel");
 				while (r.next()) {
-					System.out.println(r.getString("id")+" "+r.getInt("order_id")+" "+r.getInt("current_place_id"));
+					System.out.println(r.getString("id")+" "+r.getInt("order_id"));
 				}
 			} else {
 				// pass
