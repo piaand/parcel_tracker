@@ -6,47 +6,60 @@ public class Dashboard {
 	
 	public static void main(String[] args) throws SQLException {
 		int key;
+		String db_name = "parcels.db";
+		String db_connection = "jdbc:sqlite:"
+		boolean index_on = false;
 
 		key = 0;
+		//initDatabase(db_name, index_on);
 		printWelcome();
 		while (key != 9)
 		{
 			printInstructions();
 			key = askNextStep();
 			switchTable(key);
-			queryAll("jdbc:sqlite:parcels.db", "Place");
-			queryAll("jdbc:sqlite:parcels.db", "Orderer");
-			queryAll("jdbc:sqlite:parcels.db", "Parcel");
 		}
 
 	}
-	
-	public static void initTable(String db_name, int index) throws SQLException {
+
+	public static void initDatabase(String db_connection, String db_name, boolean index) throws SQLException {
 		Connection db = null;
-		Statement s = null;
+		Statement statement = null;
+		ResultSet result = null;
+		String databaseName = null;
+		boolean db_found = false;
+		String get_connection_param = db_connection + db_name;
 
 		try {
 			db = DriverManager.getConnection(db_name);
-			s = db.createStatement();
-			s.execute("CREATE TABLE Parcel (id STRING PRIMARY KEY, order_id INTEGER, FOREIGN KEY(order_id) REFERENCES Orderer(id))");
-			s.execute("CREATE TABLE Orderer (id INTEGER PRIMARY KEY, first_name STRING, last_name STRING)");
-			s.execute("CREATE TABLE Place (id INTEGER PRIMARY KEY, name STRING UNIQUE)");
-			s.execute("CREATE TABLE Event (id INTEGER PRIMARY KEY, tracing_id STRING, place_id INTEGER, event_time STRING, description STRING, FOREIGN KEY(tracing_id) REFERENCES Parcel(id), FOREIGN KEY(place_id) REFERENCES Place(id))");
-			if (index == 1) {
-				s.execute("CREATE INDEX e_parcel_index ON Event(tracing_id)");
-				s.execute("CREATE INDEX p_orderer_index ON Parcel(order_id)");
-			} else {
-				//pass
+			result = db.getMetaData().getCatalogs();
+			statement = db.createStatement();
+			if (!db_found) {
+				statement.execute("CREATE TABLE Parcel (id STRING PRIMARY KEY, order_id INTEGER, FOREIGN KEY(order_id) REFERENCES Orderer(id))");
+				statement.execute("CREATE TABLE Orderer (id INTEGR PRIMARY KEY, first_name STRING, last_name STRING)");
+				statement.execute("CREATE TABLE Place (id INTEGER PRIMARY KEY, name STRING UNIQUE)");
+				statement.execute("CREATE TABLE Event (id INTEGER PRIMARY KEY, tracing_id STRING, place_id INTEGER, event_time STRING, description STRING, FOREIGN KEY(tracing_id) REFERENCES Parcel(id), FOREIGN KEY(place_id) REFERENCES Place(id))");
 			}
-		} catch (Exception e) {
-			System.out.print("Error: Creating tables failed - program exits.");
+			if (index) {
+				statement.execute("CREATE INDEX e_parcel_index ON Event(tracing_id)");
+				statement.execute("CREATE INDEX p_orderer_index ON Parcel(order_id)");
+			} else {
+				//statement.execute("DROP INDEX [IF EXISTS] e_parcel_index");
+				//statement.execute("DROP INDEX [IF EXISTS] p_orderer_index");
+			}
+			
+		} catch (SQLException e) {
+			int error = e.getErrorCode();
+			if (error == 1) {
+				System.out.print("Using already existing database named ");
+			}
+			System.out.print("Here the Error: "+error+"\n\nand the end.");
 			throw e;
 		} finally {
-			try { s.close(); } catch (Exception e) { /* ignored */ }
+			try { result.close(); } catch (Exception e) { /* ignored */ }
+			try { statement.close(); } catch (Exception e) { /* ignored */ }
 			try { db.close(); } catch (Exception e) { /* ignored */ }
 		}
-        
-
 	}
 
 	public static int askNextStep() {
@@ -83,20 +96,24 @@ public class Dashboard {
 		return (date);
 	}
 
+
+
 	
 	public static void switchTable(int key) throws SQLException {
 		int orderer_id;
 		int place_id;
 		int index;
+		boolean index_on;
 		String parcel_id;
 		String date;
 		String table_name;
 		if (key == 1)
 		{	
+			/*This option will be deleted from user*/
 			System.out.println("Creating a database\n");
 			try {
 				table_name = "jdbc:sqlite:parcels.db";
-				initTable(table_name, 0);	
+				initDatabase(table_name, false);
 			} catch (Exception e) {
 				System.out.println( e );
 				System.out.println("Error: Creating database didn't succeed - exiting program.\n");
@@ -188,12 +205,14 @@ public class Dashboard {
 			Ptest mytest = new Ptest();
 			table_name = "jdbc:sqlite:performancetest.db";
 			if (index == 0) {
-				initTable(table_name, index);
+				index_on = false;
+				initDatabase(table_name, index_on);
 				mytest.addTestData(table_name);
 				mytest.queryParcels(table_name);
 				mytest.queryEvents(table_name);
 			} else if (index == 1) {
-				initTable(table_name, index);
+				index_on = true;
+				initDatabase(table_name, index_on);
 				mytest.addTestData(table_name);
 				mytest.queryParcels(table_name);
 				mytest.queryEvents(table_name);
