@@ -140,6 +140,55 @@ public class Dashboard {
 		}
 	}
 
+	public static void addParceltoDB(){
+		System.out.println("Add a new parcel\n");
+		try {
+			Orderer myorderer = new Orderer();
+			orderer_id = myorderer.inDatabase();
+			if (orderer_id > 0) {
+				Parcel myparcel = new Parcel(orderer_id);
+				myparcel.insertParcel();
+			} else {
+				System.out.println("Please enter a unique orderer name or orderer name with representative id.");
+			}
+		} catch (Exception e) {
+			System.out.println("Error: Adding a new orderer to database didn't succeed - please try agin.\n");
+		}
+	}
+
+	public static void addOrderertoDB(){
+		System.out.println("Add a new orderer\n");
+		try {
+			Orderer myorderer = new Orderer();
+			myorderer.insertOrderer();
+		} catch (Exception e) {
+			System.out.println("Error: Adding a new orderer to database didn't succeed - please try agin.\n");
+		}
+	}
+
+	public static void addEventtoDB(){
+		System.out.println("Add a new event\n");
+		try {
+			Place myplace = new Place();
+			place_id = myplace.inDatabase();
+			if (place_id > 0) {
+				parcel_id = askParcelId();
+				orderer_id = getParcelOrderer(parcel_id);
+				if (orderer_id > 0)
+				{
+					Event myevent = new Event(place_id, parcel_id);
+					myevent.insertEvent();
+				} else {
+					System.out.println("This parcel is not in the database.");
+				}
+			} else {
+				System.out.println("This place is not in the database.");
+			}
+		} catch (Exception e) {
+			System.out.println("Error: Adding a new orderer to database didn't succeed - please try agin.\n");
+		}
+	}
+
 	public static void switchTable(int key) throws SQLException {
 		int orderer_id;
 		int place_id;
@@ -157,40 +206,15 @@ public class Dashboard {
 		}
 		else if (key == 3)
 		{
-			System.out.println("Add a new orderer\n");
-			Orderer myorderer = new Orderer();
-			myorderer.insertOrderer();
+			addOrderertoDB();
 		}
 		else if (key == 4)
 		{
-			System.out.println("Add a new parcel\n");
-			Orderer myorderer = new Orderer();
-			orderer_id = myorderer.inDatabase();
-			if (orderer_id > 0) {
-				Parcel myparcel = new Parcel(orderer_id);
-				myparcel.insertParcel();
-			} else {
-				System.out.println("Please enter a unique orderer name or orderer name with representative id.");
-			}
+			addParceltoDB();
 		}
 		else if (key == 5)
 		{
-			System.out.println("Add a new event\n");
-			Place myplace = new Place();
-			place_id = myplace.inDatabase();
-			if (place_id > 0) {
-				parcel_id = askParcelId();
-				orderer_id = getParcelOrderer(parcel_id);
-				if (orderer_id > 0)
-				{
-					Event myevent = new Event(place_id, parcel_id);
-					myevent.insertEvent();
-				} else {
-					System.out.println("This parcel is not in the database.");
-				}
-			} else {
-				System.out.println("This place is not in the database.");
-			}
+			addEventtoDB();
 		}
 		else if (key == 6)
 		{
