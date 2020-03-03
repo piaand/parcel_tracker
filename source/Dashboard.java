@@ -215,14 +215,14 @@ public class Dashboard {
 				mytest.addTestData(db_connection, db_name);
 				mytest.queryParcels(db_connection, db_name);
 				mytest.queryEvents(db_connection, db_name);
-				mytest.removeTestadata(db_connection, db_name);
+				mytest.deleteTestdata(db_connection, db_name);
 			} else if (index == 1) {
 				index_on = true;
 				initDatabase(db_connection, db_name, index_on);
 				mytest.addTestData(db_connection, db_name);
 				mytest.queryParcels(db_connection, db_name);
 				mytest.queryEvents(db_connection, db_name);
-				mytest.removeTestadata(db_connection, db_name);
+				mytest.deleteTestdata(db_connection, db_name);
 			} else {
 				System.out.println("Press either 1 or 0.\n");
 			}

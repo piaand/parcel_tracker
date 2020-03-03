@@ -193,19 +193,19 @@ public class Ptest {
 		
 	}
 
-	public static void deleteTestdata(String db_name) throws SQLException {
+	public static void deleteTestdata(String db_connection, String db_name) throws SQLException {
 		String connection_params = db_name + db_connection;
 		Connection db = null;
 		PreparedStatement prepStatement = null;
 		try {
 			File db_file = new File("/src/"+db_name); 
-			if(file.delete()) { 
+			if (db_file.delete()) { 
             System.out.println("File deleted successfully"); 
         	} else { 
 			System.out.println("Failed to delete the file");
 			} 
 		} catch (Exception e) {
-			//TODO: handle exception
+			System.out.println("e");
 		}
 
 	}
