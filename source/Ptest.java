@@ -32,7 +32,7 @@ public class Ptest {
 	}
 
 	public void queryParcels(String db_name, String db_connection) throws SQLException {
-		String connection_params = db_name + db_connection;
+		String connection_param = db_name + db_connection;
 		Random rand = new Random();
 		long start = 0;
 		Connection db = null;
@@ -42,7 +42,7 @@ public class Ptest {
 		int queries = 1000;
 
 		 try {
-			db = DriverManager.getConnection(connection_params);
+			db = DriverManager.getConnection(connection_param);
 			p = db.prepareStatement("SELECT COUNT(b) AS parcel_count FROM (SELECT Parcel.id AS b, Orderer.id AS c FROM Orderer LEFT JOIN Parcel ON Parcel.order_id=Orderer.id) WHERE c=?");
 			start = System.nanoTime();
 			while (count < queries) {
@@ -61,7 +61,7 @@ public class Ptest {
 	}
 
 	public void queryEvents(String db_name, String db_connection) throws SQLException {
-		String connection_params = db_name + db_connection;
+		String connection_param = db_name + db_connection;
 		Random rand = new Random();
 		long start = 0;
 		Connection db = null;
@@ -71,7 +71,7 @@ public class Ptest {
 		int queries = 1000;
 
 		 try {
-			db = DriverManager.getConnection(connection_params);
+			db = DriverManager.getConnection(connection_param);
 			p = db.prepareStatement("SELECT COUNT(b) AS event_count FROM (SELECT Event.id AS b, Parcel.id AS c FROM Parcel LEFT JOIN Event ON Parcel.id=Event.tracing_id) WHERE c=?");
 			start = System.nanoTime();
 			while (count < queries) {
@@ -90,7 +90,7 @@ public class Ptest {
 	}
 
 	public void addTestData(String db_name, String db_connection) throws SQLException {
-		String connection_params = db_name + db_connection;
+		String connection_param = db_name + db_connection;
 		long start = 0;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Timestamp timestamp = null;
@@ -117,7 +117,7 @@ public class Ptest {
 		int len_event = this.tevent.size();
 		int i = 0;
 		try {
-			db = DriverManager.getConnection(connection_params);
+			db = DriverManager.getConnection(connection_param);
 			db.setAutoCommit(false);
 			start = System.nanoTime();
 			p1 = db.prepareStatement("INSERT INTO Place(id,name) VALUES (?,?)");
@@ -194,7 +194,7 @@ public class Ptest {
 	}
 
 	public static void deleteTestdata(String db_connection, String db_name) throws SQLException {
-		String connection_params = db_name + db_connection;
+		String connection_param = db_name + db_connection;
 		Connection db = null;
 		PreparedStatement prepStatement = null;
 		try {

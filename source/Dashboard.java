@@ -3,12 +3,12 @@ import java.util.*;
 import java.sql.*;
 
 public class Dashboard {
+	static String db_name = "parcels.db";
+	static String db_connection = "jdbc:sqlite:";
+	static boolean index_on = false;
 	
 	public static void main(String[] args) throws SQLException {
 		int key;
-		String db_name = "parcels.db";
-		String db_connection = "jdbc:sqlite:";
-		boolean index_on = false;
 
 		initDatabase(db_connection, db_name, index_on);
 		printWelcome();
@@ -27,11 +27,10 @@ public class Dashboard {
 		Connection db = null;
 		Statement statement = null;
 		ResultSet result = null;
-		boolean db_found = false;
-		String get_connection_param = db_connection + db_name;
+		String connection_param = db_connection + db_name;
 
 		try {
-			db = DriverManager.getConnection(get_connection_param);
+			db = DriverManager.getConnection(connection_param);
 			statement = db.createStatement();
 			statement.execute("CREATE TABLE Parcel (id STRING PRIMARY KEY, order_id INTEGER, FOREIGN KEY(order_id) REFERENCES Orderer(id))");
 			statement.execute("CREATE TABLE Orderer (id INTEGR PRIMARY KEY, first_name STRING, last_name STRING)");
@@ -103,37 +102,58 @@ public class Dashboard {
 		return (date);
 	}
 
-	
+	public static String askTable() {
+		String table;
+		Scanner input = new Scanner(System.in);
+
+		System.out.print("Enter the name of the table you want to query: ");
+		table = input.nextLine();
+		return (table);
+	}
+
+	public static void showContentsDB() {
+		List<String> table_names = Arrays.asList("Place", "Orderer", "Event", "Parcel");
+
+		try {
+			System.out.println("Show contents of database.\nThe current tables are");
+			table_names.forEach(name -> System.out.println(name));
+			String table_name = askTable();
+			if (table_names.contains(table_name)) {
+				queryAll(table_name);
+				System.out.println("Printing ends.");
+			}
+			else {
+				System.out.println("Please enter a table name mentioned in the list");
+			}
+		} catch (Exception e) {
+			System.out.println("Please try again.");
+		}
+	}
+
+	public static void addPlacetoDB(){
+		System.out.println("Add a new place\n");
+		try {
+			Place myplace = new Place();
+			myplace.insertPlace();
+		} catch (Exception e) {
+			System.out.println("Error: Adding a new place to database didn't succeed - please try agin.\n");
+		}
+	}
+
 	public static void switchTable(int key) throws SQLException {
 		int orderer_id;
 		int place_id;
 		int index;
-		boolean index_on;
 		String parcel_id;
 		String date;
-		String db_name = "parcels.db";
-		String db_connection = "jdbc:sqlite:";
+		
 		if (key == 1)
-		{	
-			/*This option will be deleted from user*/
-			System.out.println("Creating a database\n");
-			try {
-				initDatabase(db_connection, db_name, false);
-			} catch (Exception e) {
-				System.out.println( e );
-				System.out.println("Error: Creating database didn't succeed - exiting program.\n");
-				throw e;
-			}
+		{
+			showContentsDB();
 		}
 		else if (key == 2)
 		{
-			System.out.println("Add a new place\n");
-			try {
-				Place myplace = new Place();
-				myplace.insertPlace();
-			} catch (Exception e) {
-				System.out.println("Error: Adding a new place to database didn't succeed - please try agin.\n");
-			}
+			addPlacetoDB();
 		}
 		else if (key == 3)
 		{
@@ -233,35 +253,42 @@ public class Dashboard {
 		}
 	}
 	
-	
-	public static void queryAll(String db_name, String table_name) throws SQLException {
+
+	public static void queryAll(String table_name) throws SQLException {
 		Connection db = null;
 		Statement s = null;
 		ResultSet r = null;
+		String connection_param = db_connection + db_name;
 
 		try {
-			db = DriverManager.getConnection(db_name);
+			db = DriverManager.getConnection(connection_param);
 			s = db.createStatement();
-			if (table_name == "Place") {
+			if (table_name.equals("Place")) {
 				r = s.executeQuery("SELECT * FROM Place");
 				while (r.next()) {
 					System.out.println(r.getInt("id")+" "+r.getString("name"));
 				}
-			} else if (table_name == "Orderer") {
+			} else if (table_name.equals("Orderer")) {
 				r = s.executeQuery("SELECT * FROM Orderer");
 				while (r.next()) {
 					System.out.println(r.getInt("id")+" "+r.getString("first_name")+" "+r.getString("last_name"));
 				}
-			} else if (table_name == "Parcel") {
+			} else if (table_name.equals("Parcel")) {
 				r = s.executeQuery("SELECT * FROM Parcel");
 				while (r.next()) {
 					System.out.println(r.getString("id")+" "+r.getInt("order_id"));
 				}
+			} else if (table_name.equals("Event")) {
+				r = s.executeQuery("SELECT * FROM Event");
+				System.out.println("Event print not applied yet");
+				/*while (r.next()) {
+					System.out.println(r.getString("id")+" "+r.getInt("order_id"));
+				}*/
 			} else {
-				// pass
+				System.out.println("Table name was not found");
 			}
 		} catch (Exception e) {
-			System.out.println("Error: querying tables faced an exception. Please try again.");
+			System.out.println("Error: querying tables faced an exception.");
 		} finally {
 			try { r.close(); } catch (Exception e) { /* ignored */ }
 			try { s.close(); } catch (Exception e) { /* ignored */ }
@@ -325,7 +352,7 @@ public class Dashboard {
 
 	public static void printInstructions() {
 		System.out.println("\n-----------");
-		System.out.println("Press 1 to create a new database");
+		System.out.println("Press 1 to query the contents of parcel database");
 		System.out.println("Press 2 to add a new place for parcel to be delivered");
 		System.out.println("Press 3 to add orderer's information");
 		System.out.println("Press 4 to add a new parcel to be delivered");
