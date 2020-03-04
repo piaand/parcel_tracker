@@ -111,7 +111,7 @@ public class Dashboard {
 		return (table);
 	}
 
-	public static void showContentsDB() {
+	public static void showContentsDB() throws SQLException {
 		List<String> table_names = Arrays.asList("Place", "Orderer", "Event", "Parcel");
 
 		try {
@@ -130,7 +130,7 @@ public class Dashboard {
 		}
 	}
 
-	public static void addPlacetoDB(){
+	public static void addPlacetoDB() throws SQLException {
 		System.out.println("Add a new place\n");
 		try {
 			Place myplace = new Place();
@@ -140,7 +140,8 @@ public class Dashboard {
 		}
 	}
 
-	public static void addParceltoDB(){
+	public static void addParceltoDB() throws SQLException {
+		int orderer_id;
 		System.out.println("Add a new parcel\n");
 		try {
 			Orderer myorderer = new Orderer();
@@ -156,7 +157,7 @@ public class Dashboard {
 		}
 	}
 
-	public static void addOrderertoDB(){
+	public static void addOrderertoDB() throws SQLException {
 		System.out.println("Add a new orderer\n");
 		try {
 			Orderer myorderer = new Orderer();
@@ -166,7 +167,10 @@ public class Dashboard {
 		}
 	}
 
-	public static void addEventtoDB(){
+	public static void addEventtoDB() throws SQLException {
+		int orderer_id;
+		int place_id;
+		String parcel_id;
 		System.out.println("Add a new event\n");
 		try {
 			Place myplace = new Place();
@@ -189,11 +193,67 @@ public class Dashboard {
 		}
 	}
 
-	public static void switchTable(int key) throws SQLException {
-		int orderer_id;
-		int place_id;
-		int index;
+	public static void fetchParcelEvents() throws SQLException {
 		String parcel_id;
+		System.out.println("Fetch all events of a parcel\n");
+		parcel_id = askParcelId();
+		getParcelEvents(parcel_id);
+	}
+
+	public static void fetchOrdererParcels() throws SQLException {
+		int orderer_id;
+		System.out.println("Fetch amount events of all parcels of the orderer\n");
+		Orderer myorderer = new Orderer();
+		orderer_id = myorderer.inDatabase();
+		if (orderer_id > 0) {
+			myorderer.getParcelIDs(orderer_id);
+		} else {
+			System.out.println("Please enter a unique orderer name or orderer name with representative id.");
+		}
+	}
+
+	public static void fetchPlaceParcels() throws SQLException {
+		int place_id;
+		String date;
+		System.out.println("Fetch amount events at a place on a date\n");
+		Place myplace = new Place();
+		place_id = myplace.inDatabase();
+		if (place_id > 0) {
+			date = askDate();
+			myplace.fetchEvents(date);
+		} else {
+			System.out.println("This place is not in the database.");
+		}
+	}
+
+	public static void performanceTesting() throws SQLException {
+		int index;
+		Scanner input = new Scanner(System.in);
+		System.out.println("Doing performance tests\n");
+		System.out.print("Press 0 to run test without index and 1 to run with index: ");
+		index = input.nextInt();
+		Ptest mytest = new Ptest();
+		db_name = "performancetest.db";
+		if (index == 0) {
+			index_on = false;
+			initDatabase(db_connection, db_name, index_on);
+			mytest.addTestData(db_connection, db_name);
+			mytest.queryParcels(db_connection, db_name);
+			mytest.queryEvents(db_connection, db_name);
+			mytest.deleteTestdata(db_connection, db_name);
+		} else if (index == 1) {
+			index_on = true;
+			initDatabase(db_connection, db_name, index_on);
+			mytest.addTestData(db_connection, db_name);
+			mytest.queryParcels(db_connection, db_name);
+			mytest.queryEvents(db_connection, db_name);
+			mytest.deleteTestdata(db_connection, db_name);
+		} else {
+			System.out.println("Press either 1 or 0.\n");
+		}
+	}
+
+	public static void switchTable(int key) throws SQLException {
 		String date;
 		
 		if (key == 1)
@@ -218,58 +278,19 @@ public class Dashboard {
 		}
 		else if (key == 6)
 		{
-			System.out.println("Fetch all events of a parcel\n");
-			parcel_id = askParcelId();
-			getParcelEvents(parcel_id);
+			fetchParcelEvents();
 		}
 		else if (key == 7)
 		{
-			System.out.println("Fetch amount events of all parcels of the orderer\n");
-			Orderer myorderer = new Orderer();
-			orderer_id = myorderer.inDatabase();
-			if (orderer_id > 0) {
-				myorderer.getParcelIDs(orderer_id);
-			} else {
-				System.out.println("Please enter a unique orderer name or orderer name with representative id.");
-			}
+			fetchOrdererParcels();
 		}
 		else if (key == 8)
 		{
-			System.out.println("Fetch amount events at a place on a date\n");
-			Place myplace = new Place();
-			place_id = myplace.inDatabase();
-			if (place_id > 0) {
-				date = askDate();
-				myplace.fetchEvents(date);
-			} else {
-				System.out.println("This place is not in the database.");
-			}
+			fetchPlaceParcels();
 		}
 		else if (key == 10)
 		{
-			Scanner input = new Scanner(System.in);
-			System.out.println("Doing performance tests\n");
-			System.out.print("Press 0 to run test without index and 1 to run with index: ");
-			index = input.nextInt();
-			Ptest mytest = new Ptest();
-			db_name = "performancetest.db";
-			if (index == 0) {
-				index_on = false;
-				initDatabase(db_connection, db_name, index_on);
-				mytest.addTestData(db_connection, db_name);
-				mytest.queryParcels(db_connection, db_name);
-				mytest.queryEvents(db_connection, db_name);
-				mytest.deleteTestdata(db_connection, db_name);
-			} else if (index == 1) {
-				index_on = true;
-				initDatabase(db_connection, db_name, index_on);
-				mytest.addTestData(db_connection, db_name);
-				mytest.queryParcels(db_connection, db_name);
-				mytest.queryEvents(db_connection, db_name);
-				mytest.deleteTestdata(db_connection, db_name);
-			} else {
-				System.out.println("Press either 1 or 0.\n");
-			}
+			performanceTesting();
 		}
 		else if (key == 9)
 		{
