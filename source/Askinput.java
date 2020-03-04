@@ -9,6 +9,8 @@ public class Askinput {
 	public Askinput(String question) {
 		this.input = new Scanner(System.in);
 		this.question = question;
+		this.text = null;
+		this.nb = 0;
 	}
 
 	public void askQuestionText() {

@@ -8,80 +8,67 @@ public class Dashboard {
 	static boolean index_on = false;
 	
 	public static void main(String[] args) throws SQLException {
-		int key;
+		boolean inList;
+		List<Integer> instructions = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
 		initDatabase(db_connection, db_name, index_on);
 		printWelcome();
 
-		key = 0;
-		while (key != 9)
+		Askinput key = new Askinput("What to do next: ");
+		while (key.nb != 9)
 		{
 			printInstructions();
-			key = askNextStep();
-			switchTable(key);
-		}
-
-	}
-
-	public static void initDatabase(String db_connection, String db_name, boolean index) throws SQLException {
-		Connection db = null;
-		Statement statement = null;
-		ResultSet result = null;
-		String connection_param = db_connection + db_name;
-
-		try {
-			db = DriverManager.getConnection(connection_param);
-			statement = db.createStatement();
-			statement.execute("CREATE TABLE Parcel (id STRING PRIMARY KEY, order_id INTEGER, FOREIGN KEY(order_id) REFERENCES Orderer(id))");
-			statement.execute("CREATE TABLE Orderer (id INTEGR PRIMARY KEY, first_name STRING, last_name STRING)");
-			statement.execute("CREATE TABLE Place (id INTEGER PRIMARY KEY, name STRING UNIQUE)");
-			statement.execute("CREATE TABLE Event (id INTEGER PRIMARY KEY, tracing_id STRING, place_id INTEGER, event_time STRING, description STRING, FOREIGN KEY(tracing_id) REFERENCES Parcel(id), FOREIGN KEY(place_id) REFERENCES Place(id))");
-			placeIndex(index, statement);
-		} catch (SQLException e) {
-			int error = e.getErrorCode();
-			if (error == 1) {
-				System.out.print("Using already existing database named "+db_name);
-			} else {
-				System.out.print("Here the Error: "+error+"\n\nand the end.");
-				throw e;
+			key.askQuestionInt();
+			while (!(inList = instructions.contains(key.nb))) {
+				System.out.println("Nope, try again.");
+				key.askQuestionInt();
 			}
-		} finally {
-			try { result.close(); } catch (Exception e) { /* ignored */ }
-			try { statement.close(); } catch (Exception e) { /* ignored */ }
-			try { db.close(); } catch (Exception e) { /* ignored */ }
+			switchTable(key.nb);
 		}
+
 	}
 
-	public static void placeIndex(boolean on, Statement statement) throws SQLException {
-		try {
-			if (on) {
-				statement.execute("CREATE INDEX e_parcel_index ON Event(tracing_id)");
-				statement.execute("CREATE INDEX p_orderer_index ON Parcel(order_id)");
-			} else {
-				statement.execute("DROP INDEX [IF EXISTS] e_parcel_index");
-				statement.execute("DROP INDEX [IF EXISTS] p_orderer_index");
-			}	
-		} catch (SQLException e) {
-			int error = e.getErrorCode();
-			System.out.print("Error: placing index faced an error: "+error+"\n\nand the end.");
-			throw e;
-		}
-	}
-
-	public static int askNextStep() {
-		int key;
-		boolean inList;
-		List<Integer> instructions = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-		Scanner input = new Scanner(System.in);
-		
-		System.out.print("What to do next?: ");
-		key = input.nextInt();
-		while (!(inList = instructions.contains(key)))
+	public static void switchTable(int key) throws SQLException {
+		if (key == 1)
 		{
-			System.out.println("Nope! Try again: ");
-			key = input.nextInt();
+			showContentsDB();
 		}
-		return (key);
+		else if (key == 2)
+		{
+			addPlacetoDB();
+		}
+		else if (key == 3)
+		{
+			addOrderertoDB();
+		}
+		else if (key == 4)
+		{
+			addParceltoDB();
+		}
+		else if (key == 5)
+		{
+			addEventtoDB();
+		}
+		else if (key == 6)
+		{
+			fetchParcelEvents();
+		}
+		else if (key == 7)
+		{
+			fetchOrdererParcels();
+		}
+		else if (key == 8)
+		{
+			fetchPlaceParcels();
+		}
+		else if (key == 10)
+		{
+			performanceTesting();
+		}
+		else if (key == 9)
+		{
+			System.out.println("Byebye! System closes now\n");
+		}
 	}
 
 
@@ -228,48 +215,6 @@ public class Dashboard {
 		}
 	}
 
-	public static void switchTable(int key) throws SQLException {
-		if (key == 1)
-		{
-			showContentsDB();
-		}
-		else if (key == 2)
-		{
-			addPlacetoDB();
-		}
-		else if (key == 3)
-		{
-			addOrderertoDB();
-		}
-		else if (key == 4)
-		{
-			addParceltoDB();
-		}
-		else if (key == 5)
-		{
-			addEventtoDB();
-		}
-		else if (key == 6)
-		{
-			fetchParcelEvents();
-		}
-		else if (key == 7)
-		{
-			fetchOrdererParcels();
-		}
-		else if (key == 8)
-		{
-			fetchPlaceParcels();
-		}
-		else if (key == 10)
-		{
-			performanceTesting();
-		}
-		else if (key == 9)
-		{
-			System.out.println("Byebye! System closes now\n");
-		}
-	}
 	
 
 	public static void queryAll(String table_name) throws SQLException {
@@ -367,6 +312,52 @@ public class Dashboard {
 			return (db_orderid);
 		}
 	}
+
+	public static void initDatabase(String db_connection, String db_name, boolean index) throws SQLException {
+		Connection db = null;
+		Statement statement = null;
+		ResultSet result = null;
+		String connection_param = db_connection + db_name;
+
+		try {
+			db = DriverManager.getConnection(connection_param);
+			statement = db.createStatement();
+			statement.execute("CREATE TABLE Parcel (id STRING PRIMARY KEY, order_id INTEGER, FOREIGN KEY(order_id) REFERENCES Orderer(id))");
+			statement.execute("CREATE TABLE Orderer (id INTEGR PRIMARY KEY, first_name STRING, last_name STRING)");
+			statement.execute("CREATE TABLE Place (id INTEGER PRIMARY KEY, name STRING UNIQUE)");
+			statement.execute("CREATE TABLE Event (id INTEGER PRIMARY KEY, tracing_id STRING, place_id INTEGER, event_time STRING, description STRING, FOREIGN KEY(tracing_id) REFERENCES Parcel(id), FOREIGN KEY(place_id) REFERENCES Place(id))");
+			placeIndex(index, statement);
+		} catch (SQLException e) {
+			int error = e.getErrorCode();
+			if (error == 1) {
+				System.out.print("Using already existing database named "+db_name);
+			} else {
+				System.out.print("Here the Error: "+error+"\n\nand the end.");
+				throw e;
+			}
+		} finally {
+			try { result.close(); } catch (Exception e) { /* ignored */ }
+			try { statement.close(); } catch (Exception e) { /* ignored */ }
+			try { db.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+
+	public static void placeIndex(boolean on, Statement statement) throws SQLException {
+		try {
+			if (on) {
+				statement.execute("CREATE INDEX e_parcel_index ON Event(tracing_id)");
+				statement.execute("CREATE INDEX p_orderer_index ON Parcel(order_id)");
+			} else {
+				statement.execute("DROP INDEX [IF EXISTS] e_parcel_index");
+				statement.execute("DROP INDEX [IF EXISTS] p_orderer_index");
+			}	
+		} catch (SQLException e) {
+			int error = e.getErrorCode();
+			System.out.print("Error: placing index faced an error: "+error+"\n\nand the end.");
+			throw e;
+		}
+	}
+
 
 	public static void printInstructions() {
 		System.out.println("\n-----------");
