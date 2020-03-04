@@ -84,32 +84,6 @@ public class Dashboard {
 		return (key);
 	}
 
-	public static String askParcelId() {
-		String id;
-		Scanner input = new Scanner(System.in);
-		
-		System.out.print("Enter the parcel tracking id: ");
-		id = input.nextLine();
-		return (id);
-	}
-
-	public static String askDate() {
-		String date;
-		Scanner input = new Scanner(System.in);
-
-		System.out.print("Enter the date with the format yyyy-mm-dd: ");
-		date = input.nextLine();
-		return (date);
-	}
-
-	public static String askTable() {
-		String table;
-		Scanner input = new Scanner(System.in);
-
-		System.out.print("Enter the name of the table you want to query: ");
-		table = input.nextLine();
-		return (table);
-	}
 
 	public static void showContentsDB() throws SQLException {
 		List<String> table_names = Arrays.asList("Place", "Orderer", "Event", "Parcel");
@@ -117,9 +91,10 @@ public class Dashboard {
 		try {
 			System.out.println("Show contents of database.\nThe current tables are");
 			table_names.forEach(name -> System.out.println(name));
-			String table_name = askTable();
-			if (table_names.contains(table_name)) {
-				queryAll(table_name);
+			Askinput table_name = new Askinput("Enter the name of the table you want to query: ");
+			table_name.askQuestionText();
+			if (table_names.contains(table_name.text)) {
+				queryAll(table_name.text);
 				System.out.println("Printing ends.");
 			}
 			else {
@@ -170,17 +145,17 @@ public class Dashboard {
 	public static void addEventtoDB() throws SQLException {
 		int orderer_id;
 		int place_id;
-		String parcel_id;
 		System.out.println("Add a new event\n");
 		try {
 			Place myplace = new Place();
 			place_id = myplace.inDatabase();
 			if (place_id > 0) {
-				parcel_id = askParcelId();
-				orderer_id = getParcelOrderer(parcel_id);
+				Askinput parcel_id = new Askinput("Enter the parcel tracking id: ");
+				parcel_id.askQuestionText();
+				orderer_id = getParcelOrderer(parcel_id.text);
 				if (orderer_id > 0)
 				{
-					Event myevent = new Event(place_id, parcel_id);
+					Event myevent = new Event(place_id, parcel_id.text);
 					myevent.insertEvent();
 				} else {
 					System.out.println("This parcel is not in the database.");
@@ -194,10 +169,10 @@ public class Dashboard {
 	}
 
 	public static void fetchParcelEvents() throws SQLException {
-		String parcel_id;
 		System.out.println("Fetch all events of a parcel\n");
-		parcel_id = askParcelId();
-		getParcelEvents(parcel_id);
+		Askinput parcel_id = new Askinput("Enter the parcel tracking id: ");
+		parcel_id.askQuestionText();
+		getParcelEvents(parcel_id.text);
 	}
 
 	public static void fetchOrdererParcels() throws SQLException {
@@ -214,18 +189,26 @@ public class Dashboard {
 
 	public static void fetchPlaceParcels() throws SQLException {
 		int place_id;
-		String date;
 		System.out.println("Fetch amount events at a place on a date\n");
 		Place myplace = new Place();
 		place_id = myplace.inDatabase();
 		if (place_id > 0) {
-			date = askDate();
-			myplace.fetchEvents(date);
+			Askinput date = new Askinput("Enter the date with the format yyyy-mm-dd: ");
+			date.askQuestionText();
+			myplace.fetchEvents(date.text);
 		} else {
 			System.out.println("This place is not in the database.");
 		}
 	}
 
+	public static void runPerformanceTest(boolean index_on, Ptest mytest) throws SQLException {
+		initDatabase(db_connection, db_name, index_on);
+		mytest.addTestData(db_connection, db_name);
+		mytest.queryParcels(db_connection, db_name);
+		mytest.queryEvents(db_connection, db_name);
+		mytest.deleteTestdata(db_connection, db_name);
+	}
+	
 	public static void performanceTesting() throws SQLException {
 		int index;
 		Scanner input = new Scanner(System.in);
@@ -236,26 +219,16 @@ public class Dashboard {
 		db_name = "performancetest.db";
 		if (index == 0) {
 			index_on = false;
-			initDatabase(db_connection, db_name, index_on);
-			mytest.addTestData(db_connection, db_name);
-			mytest.queryParcels(db_connection, db_name);
-			mytest.queryEvents(db_connection, db_name);
-			mytest.deleteTestdata(db_connection, db_name);
+			runPerformanceTest(index_on, mytest);
 		} else if (index == 1) {
 			index_on = true;
-			initDatabase(db_connection, db_name, index_on);
-			mytest.addTestData(db_connection, db_name);
-			mytest.queryParcels(db_connection, db_name);
-			mytest.queryEvents(db_connection, db_name);
-			mytest.deleteTestdata(db_connection, db_name);
+			runPerformanceTest(index_on, mytest);
 		} else {
 			System.out.println("Press either 1 or 0.\n");
 		}
 	}
 
 	public static void switchTable(int key) throws SQLException {
-		String date;
-		
 		if (key == 1)
 		{
 			showContentsDB();
