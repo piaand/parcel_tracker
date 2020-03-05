@@ -17,6 +17,7 @@ public class Event {
 		this.parcel_id = parcel_id;
 		this.place_id = place_id;
 	}
+	
 
 	public static void updateEventCount(int current_count) throws SQLException {
 		count = current_count + 1;

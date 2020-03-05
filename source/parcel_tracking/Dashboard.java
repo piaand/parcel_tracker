@@ -12,12 +12,17 @@ public class Dashboard {
 	public static void main(String[] args) throws SQLException {
 		try  {
 			boolean inList;
+			int i = 0;
 			int count;
 			List<Integer> instructions = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
 			printWelcome();
 			initDatabase(db_connection, db_name, index_on);
-			table_names.forEach(name -> updateCount(db_connection, db_name, name));
+			while (i < 4) {
+				String name = table_names.get(i);
+				updateCount(db_connection, db_name, name);
+				i++;
+			}
 
 			Askinput key = new Askinput("What to do next: ");
 			while (key.nb != 9)
@@ -360,15 +365,23 @@ public class Dashboard {
 	}
 
 	public static void updateCount(String db_connection, String db_name, String table_name) throws SQLException {
+		String event_query = "SELECT COALESCE(MAX(id),0) AS max FROM Event";
+		String parcel_query = "SELECT COALESCE(MAX(id),0) AS max FROM Parcel";
+		String place_query = "SELECT COALESCE(MAX(id),0) AS max FROM Place";
+		String orderer_query = "SELECT COALESCE(MAX(id),0) AS max FROM Orderer";
+		int count;
 		try {
-			int count = getCurrentCount(db_connection, db_name, table_name);
 			if (table_name == "Event") {
+				count = getCurrentCount(db_connection, db_name, event_query);
 				Event.updateEventCount(count);
 			} else if (table_name == "Parcel") {
+				count = getCurrentCount(db_connection, db_name, parcel_query);
 				Parcel.updateParcelCount(count);
 			} else if (table_name == "Place") {
+				count = getCurrentCount(db_connection, db_name, place_query);
 				Place.updatePlaceCount(count);
 			} else if (table_name == "Orderer") {
+				count = getCurrentCount(db_connection, db_name, orderer_query);
 				Orderer.updateOrdererCount(count);
 			} else {
 				System.out.print("This table name doesn't exist.");
@@ -378,7 +391,7 @@ public class Dashboard {
 		}
 	}
 
-	public static int getCurrentCount(String db_connection, String db_name, String table_name) throws SQLException {
+	public static int getCurrentCount(String db_connection, String db_name, String query) throws SQLException {
 		String connection_param = db_connection + db_name;
 		Connection db = null;
 		PreparedStatement preparedStatement = null;
@@ -387,12 +400,12 @@ public class Dashboard {
 
 		try {
 			db = DriverManager.getConnection(connection_param);
-			preparedStatement = db.prepareStatement("SELECT COALESCE(MAX(id),0) AS max FROM ?");
-			preparedStatement.setString(1, table_name);
+			preparedStatement = db.prepareStatement(query);
 			result = preparedStatement.executeQuery();
-			count = result.getInt("max") + 1;
+			count = result.getInt("max");
 		} catch (Exception e) {
 			System.out.println("Error: updating id count faced an error. System will exit.");
+			System.out.println( e );
 			throw e;
 		} finally {
 			try { result.close(); } catch (Exception e) { /* ignored */ }
