@@ -2,34 +2,38 @@ package parcel_tracking;
 import java.text.*;
 import java.util.*;
 import java.sql.*;
-import parcel_tracking.*;
 
 public class Dashboard {
+	static List<String> table_names = Arrays.asList("Place", "Orderer", "Event", "Parcel");
 	static String db_name = "parcels.db";
 	static String db_connection = "jdbc:sqlite:";
 	static boolean index_on = false;
 	
 	public static void main(String[] args) throws SQLException {
-		boolean inList;
-		List<Integer> instructions = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+		try  {
+			boolean inList;
+			int count;
+			List<Integer> instructions = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
-		printWelcome();
-		initDatabase(db_connection, db_name, index_on);
-		//updateIndexCount(db_connection, db_name);
-		Event.updateEventCount(db_connection, db_name);
+			printWelcome();
+			initDatabase(db_connection, db_name, index_on);
+			table_names.forEach(name -> updateCount(db_connection, db_name, name));
 
-		Askinput key = new Askinput("What to do next: ");
-		while (key.nb != 9)
-		{
-			printInstructions();
-			key.askQuestionInt();
-			while (!(inList = instructions.contains(key.nb))) {
-				System.out.println("Nope, try again.");
+			Askinput key = new Askinput("What to do next: ");
+			while (key.nb != 9)
+			{
+				printInstructions();
 				key.askQuestionInt();
+				while (!(inList = instructions.contains(key.nb))) {
+					System.out.println("Nope, try again.");
+					key.askQuestionInt();
+				}
+				switchTable(key.nb);
 			}
-			switchTable(key.nb);
+		} catch (SQLException e) {
+			System.out.println("Error: system will close");
+			throw e;
 		}
-
 	}
 
 	public static void switchTable(int key) throws SQLException {
@@ -77,8 +81,6 @@ public class Dashboard {
 
 
 	public static void showContentsDB() throws SQLException {
-		List<String> table_names = Arrays.asList("Place", "Orderer", "Event", "Parcel");
-
 		try {
 			System.out.println("Show contents of database.\nThe current tables are");
 			table_names.forEach(name -> System.out.println(name));
@@ -314,10 +316,6 @@ public class Dashboard {
 		}
 	}
 
-	/*public static void updateIndexCount(String db_connection, String db_name) {
-		Event.updateEventCount(db_connection, db_name);
-	}*/
-
 	public static void initDatabase(String db_connection, String db_name, boolean index) throws SQLException {
 		Connection db = null;
 		Statement statement = null;
@@ -359,6 +357,50 @@ public class Dashboard {
 			System.out.print("Error: placing index faced an error: "+error+"\n\nand the end.");
 			throw e;
 		}
+	}
+
+	public static void updateCount(String db_connection, String db_name, String table_name) throws SQLException {
+		try {
+			int count = getCurrentCount(db_connection, db_name, table_name);
+			if (table_name == "Event") {
+				Event.updateEventCount(count);
+			} else if (table_name == "Parcel") {
+				Parcel.updateParcelCount(count);
+			} else if (table_name == "Place") {
+				Place.updatePlaceCount(count);
+			} else if (table_name == "Orderer") {
+				Orderer.updateOrdererCount(count);
+			} else {
+				System.out.print("This table name doesn't exist.");
+			}	
+		} catch (Exception e) {
+			//TODO: handle exception
+		}
+	}
+
+	public static int getCurrentCount(String db_connection, String db_name, String table_name) throws SQLException {
+		String connection_param = db_connection + db_name;
+		Connection db = null;
+		PreparedStatement preparedStatement = null;
+		ResultSet result = null;
+		int count = 0;
+
+		try {
+			db = DriverManager.getConnection(connection_param);
+			preparedStatement = db.prepareStatement("SELECT COALESCE(MAX(id),0) AS max FROM ?");
+			preparedStatement.setString(1, table_name);
+			result = preparedStatement.executeQuery();
+			count = result.getInt("max") + 1;
+		} catch (Exception e) {
+			System.out.println("Error: updating id count faced an error. System will exit.");
+			throw e;
+		} finally {
+			try { result.close(); } catch (Exception e) { /* ignored */ }
+			try { preparedStatement.close(); } catch (Exception e) { /* ignored */ }
+			try { db.close(); } catch (Exception e) { /* ignored */ }
+			return (count);
+		}
+
 	}
 
 

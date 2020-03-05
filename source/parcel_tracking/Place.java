@@ -20,6 +20,10 @@ public class Place {
 		System.out.println("ID:"+ id );
 	}
 
+	public static void updatePlaceCount(int current_count) throws SQLException {
+		count = current_count + 1;
+	}
+
 	public int inDatabase() throws SQLException {
 		int id;
 

@@ -18,6 +18,10 @@ public class Orderer {
 		this.id = count;
 	}
 
+	public static void updateOrdererCount(int current_count) throws SQLException {
+		count = current_count + 1;
+	}
+
 	public void printOrderer() {
 		System.out.println("Name of the orderer: "+ first_name +" "+ last_name);
 		System.out.println("And their ID:"+ id );

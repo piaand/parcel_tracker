@@ -2,7 +2,6 @@ package parcel_tracking;
 import java.util.*;
 import java.text.*; 
 import java.sql.*;
-import parcel_tracking.*;
 
 public class Event {
 	
@@ -19,25 +18,8 @@ public class Event {
 		this.place_id = place_id;
 	}
 
-	public static void updateEventCount(String db_connection, String db_name) throws SQLException {
-		String connection_param = db_connection + db_name;
-		Connection db = null;
-		PreparedStatement preparedStatement = null;
-		ResultSet result = null;
-		try {
-			db = DriverManager.getConnection(connection_param);
-			preparedStatement = db.prepareStatement("SELECT MAX(id) AS max FROM Event");
-			result = preparedStatement.executeQuery();
-			count = result.getInt("max") + 1;
-		} catch (Exception e) {
-			System.out.println("Error: updating id count faced an error. System will exit.");
-			throw e;
-		} finally {
-			try { result.close(); } catch (Exception e) { /* ignored */ }
-			try { preparedStatement.close(); } catch (Exception e) { /* ignored */ }
-			try { db.close(); } catch (Exception e) { /* ignored */ }
-		}
-
+	public static void updateEventCount(int current_count) throws SQLException {
+		count = current_count + 1;
 	}
 
 	public void askEventDescription () {
@@ -45,7 +27,7 @@ public class Event {
 		event_description.askQuestionText();
 		this.description = event_description.text;
 	}
-	
+
 	public void printEvent() {
 		System.out.println("Event description: "+ this.description );
 		System.out.println("ID:"+ id );

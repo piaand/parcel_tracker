@@ -15,6 +15,10 @@ public class Parcel {
 		this.order_id = orderer_id;
 	}
 
+	public static void updateParcelCount(int current_count) throws SQLException {
+		count = current_count + 1;
+	}
+
 	public void printParcel() {
 		System.out.println("Parcel id: "+ this.id );
 		System.out.println("From the orderer whos id is "+ this.order_id);
