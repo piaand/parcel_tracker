@@ -1,3 +1,4 @@
+package parcel_tracking;
 import java.sql.*; // Impporta Java sql package
 import java.util.*;
 import java.text.*;
@@ -11,17 +12,17 @@ public class Ptest {
 	List<Testplace> tplace;
 	List<Testorderer> torderer;
 	List<Testparcel> tparcel;
-	List<Testevent> tevent;
+	List<Event> test_events;
 
 	public Ptest() {
 		List<Testplace> tplace = new ArrayList<>();
 		List<Testorderer> torderer = new ArrayList<>();
 		List<Testparcel> tparcel = new ArrayList<>();
-		List<Testevent> tevent = new ArrayList<>();
+		List<Event> test_events = new ArrayList<>();
 		this.tplace = createPlaces(tplace);
 		this.torderer = createOrderers(torderer);
 		this.tparcel = createParcels(tparcel, torderer);
-		this.tevent = createEvents(tevent, tparcel, tplace);
+		this.test_events = createEvents(test_events, tparcel, tplace);
 		
 	}
 	private void measureTime(long start, String mssg) {
@@ -114,7 +115,7 @@ public class Ptest {
 		int len_place = this.tplace.size();
 		int len_orderer = this.torderer.size();
 		int len_parcel = this.tparcel.size();
-		int len_event = this.tevent.size();
+		int len_event = this.test_events.size();
 		int i = 0;
 		try {
 			db = DriverManager.getConnection(connection_param);
@@ -164,10 +165,10 @@ public class Ptest {
 			i = 0;
 			p4 = db.prepareStatement("INSERT INTO Event(id,tracing_id,place_id,event_time,description) VALUES (?,?,?,?,?)");
 			while (i < len_event) {
-				id_event = this.tevent.get(i).getID();
-				place_id = this.tevent.get(i).getPlaceID();
-				parcel_id = this.tevent.get(i).getParcelID();
-				desc = this.tevent.get(i).getDescription();
+				id_event = this.test_events.get(i).getID();
+				place_id = this.test_events.get(i).getPlaceID();
+				parcel_id = this.test_events.get(i).getParcelID();
+				desc = this.test_events.get(i).getDescription();
 				p4.setInt(1,id_event);
 				p4.setInt(2,place_id);
 				p4.setString(3,parcel_id);
@@ -193,21 +194,17 @@ public class Ptest {
 		
 	}
 
-	public static void deleteTestdata(String db_connection, String db_name) throws SQLException {
-		String connection_param = db_name + db_connection;
-		Connection db = null;
-		PreparedStatement prepStatement = null;
+	public void deleteTestdata(String db_name) throws SQLException {
 		try {
 			File db_file = new File("/src/"+db_name); 
 			if (db_file.delete()) { 
-            System.out.println("File deleted successfully"); 
+            System.out.println("Database file for performace testing deleted successfully."); 
         	} else { 
-			System.out.println("Failed to delete the file");
+			System.out.println("Failed to delete the database file.");
 			} 
 		} catch (Exception e) {
 			System.out.println("e");
 		}
-
 	}
 
 	private List<Testplace> createPlaces(List<Testplace> tplace) {
@@ -259,7 +256,7 @@ public class Ptest {
 		return (tparcel);	
 	}
 
-	private List<Testevent> createEvents(List<Testevent> tevent, List<Testparcel> tparcel, List<Testplace> tplace) {
+	private List<Event> createEvents(List<Event> test_events, List<Testparcel> tparcel, List<Testplace> tplace) {
 		Random rand = new Random();
 		String parcel;
 		int place;
@@ -268,10 +265,11 @@ public class Ptest {
 		while (count <= event_amount) {
 			place = tplace.get(rand.nextInt(tplace.size())).getID(); 
 			parcel = tparcel.get(rand.nextInt(tparcel.size())).getTrackID(); 
-			Testevent testEvent = new Testevent(count, parcel, place);
-			tevent.add(testEvent);
+			Event testevent = new Event(place, parcel);
+			testevent.setID(count);
+			test_events.add(testevent);
 			count++;
 		}
-		return (tevent);	
+		return (test_events);	
 	}
 }

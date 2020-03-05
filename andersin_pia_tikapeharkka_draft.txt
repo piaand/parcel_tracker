@@ -1,0 +1,81 @@
+Raportti - Harjoitustyö, tietokantojen perusteet
+
+Harjoitustyö palautetaan yhtenä PDF-tiedostona Moodleen.
+Tiedoston nimenä on sukunimi_etunimi.pdf
+(esimerkiksi jos nimesi on Maija Virtanen, tiedoston nimi on virtanen_maija.pdf).
+
+Harjoitustyön tekijän nimi, opiskelijanumero (jos tiedossa) ja mooc.fi-tunnus
+Selostus, mitkä toiminnot harjoitustyöhön on toteutettu
+Tietokantakaavio ja SQL-skeema
+Tehokkuustestin tulokset kahdessa tapauksessa: ilman indeksejä ja indeksien lisäämisen jälkeen (näissä pitäisi olla selkeä ero)
+Selostus, miten on varmistettu, että jokaisella paikalla ja asiakkaalla on eri nimi ja jokaisella paketilla on eri seurantakoodi (entä jos on useita samanaikaisia käyttäjiä?)
+Toteutetun sovelluksen lähdekoodi
+
+
+----
+
+(Kansi) Pia Andersin, Opiskelijanumero: 015122847, MOOC-tunnus pia.m.andersin@gmail.com
+
+Sisällysluettelo
+
+1. Tiivistelmä ja selostus, mitkä toiminnot on harjoitustyöstä toteutettu
+2. Tietokannan suunnittelu
+	2.1. Tietokantakaaviot
+	2.2. SQL-skeema 
+3. Tehokkuustestin tulokset
+	3.1. Tulokset ilman indeksointia
+	3.2. Tulokset indeksoinnin jälkeen
+4. Tietokantasovelluksen toteutus ja tiedon eheys
+	3.1. Tiedon eheyden huomioinen (eli kaikilla vain yksi nimi/status)
+
+Liitteet: työn lähdekoodi
+
+
+1. Tiivistelmä työstä
+
+2. Tietokannan suunnittelu
+
+Tietokantaa suunnitellessa noudatetaan neljää perusperiaatetta:
+1. Tietokannan taulut ja niiden sarakkeet ovat kiinteät, ja tietokannan käyttäjä tekee muutoksia vain riveihin. Kaikki saman tyyppistä tietoa sisältävät rivit ovat samassa taulussa.
+2. Jokaisessa sarakkeessa on jokin yksittäinen tieto, kuten yksi luku tai merkkijono, mutta ei listaa tiedoista. Lista tallennetaan erilliseen tauluun niin, että jokainen alkio on oma rivinsä.
+3. Jokainen tieto on tasan yhdessä paikassa tietokannassa. Muualla tietoon viitataan rivin pääavaimen (käytännössä id-numeron) perusteella.
+4. Tietokannassa ei ole tietoa, jonka voi laskea tai päätellä tietokannan muun sisällön perusteella.
+(lähde materiaalit)
+
+Kappaleessa 2.1. on kuvattu tietokantakaavioiden avulla järjestelmän suunnitteluun johtavaa prosessia. Tämän jälkeen kappale 2.2. tiivistää SQL-skeeman suunnitellusta tietokantakaaviosta. 
+
+2.1. Tietokantakaaviot
+
+Harjoitustyön kuvaus määrittelee hyvin selkeän ympäristön, jossa tietokantasovellus toimii. Kuvauksessa annetaan seuraavat elementit, joista tietokantajärjestelmä koostuu:
+- Paikoista, joissa paketti voidaan skannata
+- Asiakkaasta, joka tilaa paketin
+- Paketista, joka liittyy aina tiettyyn asiakkaaseen
+- Tapahtumista, jotka syntyvät kun paketti skannataan. Tapahtumaan liittyy tapahtumakuvaus sekä hetki, jolloin tapahtuma syntyi
+
+Koska asetelma on selkeä, aloitetaan suunnittelutyö sillä, että muodostetaan tietokantakaavio harjoitustyön kuvauksen mukaisesti niin, että meille syntyy neljä taulua, joihin sisällytetään niitä koskevat tiedot. Kuva 1 näyttää taulut ja niihin lisättävän tiedon.
+
+(tähän kuva 1, jossa ei ole vielä suhteita piirrettynä)
+
+Seuraavaksi kuvataan suhteet näiden taulujen välillä. Tauluje suhteita ja koko tietokantaa suunnitellessa on hyvä ottaa huomioon määritelmät siitä, miten järjestelmää on tarkoitus käyttää tulevaisuudessa. Tässä tapauksessa saamme harjoitustyön kuvauksesta selville kaikki tarvittavat käyttötapaukset.
+
+Kuvauksessa on kerrottu, että asiakas on paketin tilaaja. Tilaaja kertoo sanana paljon enemmän järjestelmän toiminnasta kuin asiakas, joten vaihdetaan Asiakas-taulun nimeksi Tilaaja. Tulevaisuudessa haluamme ehkä kehittää järjestelmää siihen suuntaan, että meillä on asiakastaulu yksittäisille asiakkuussuhteille ja asiakkaat tekevät järjestelmässä yhdestä useaan tilausta asiakassuhteensa aikana. Tämän takia tilaajatieto on hyvä pitää erillään paketeista, kuten myös siitä syystä, että emme voi luoda uutta pakettia tietokantaan, ellei asiakas (tai tässä tilaaja) ole jo tietokannassa.
+
+Lisäksi tiedämme asiakkaalla (tilaajalla) ei saa olla samaa nimeä kuin toisella tietokannassa. Luodaan siis Tilaajat tauluun oma juokseva id tunnisteeksi jokaiselle tilaajalle, jotta myös samannimiset tilaajat pysyvät eroteltuna. Jotta saamme tiedot paketeista ja tilaajista yhdistettyä lisätään siis tilaajaid myös Paketit tauluun. Jokaisella paketilla on vain yksi tilaaja, mutta yhdellä tilaajalla voi olla useita eri paketteja.
+
+Jokaisessa paketinskannaustilanteessa syntyy tapahtuma. Tapahtuma luodaan järjestelmässä, kun sille annetaan paketin seurantakoodi, tapahtuman paikka sekä kuvaus. Seurantakoodi ja paikan id on siis hyvä lisätä myös tapahtumataulun tiedoksi. Tällöin saamme hyvän kokonaiskuvauksen kun haemme kaikki paketin tapahtumat seurantakoodin perusteella tai kun haemme tapahtumien määrää tietyssä paikassa, tiettynä päivänä.
+
+Olisi mahdollista lisätä myös tilaajaid Tapahtumat tauluun, sillä haluamme myös hakea kaikki tilaajan paketit ja niihin liittyvien tapahtumien määrät. Kun tiedot sijaitsevat samassa taulussa niin tiedon hakeminen on helpompaa syntaksitasolla ja nopeampaa koneelle suorittaa. Kuitenkin tilaajaid:n lisääminen on yksi vaiheensa tietokantaan kirjoittamisessa ja uusia tapahtumia syntyy huomattavasti useammin kuin esimerkiksi uusia tilauksia paketeille. Tiedon lisäämisen kustannuksen takia jätämme tilaajaid:n pois taulusta. Mikäli kaikkien tilaajien pakettien tapahtumien etsimisestä tulee yhä tärkeämpi ominaisuus järjestelmässä voidaan tällaista muutosta harkita uudelleen.
+
+Tapahtumat taulu ei välttämättä tarvitse omaa uniikkia tapahtumatunnistettaan, jos haluaa luottaa siihen, että jokainen skannaus tapahtuu erillisinä ajanhetkinään ja erillisenä kirjauksinaan SQLiten transaktiotasosta 4 johtuen. Jos tulevaisuudessa järjestelmään rakennetaan enemmän rinnakkaishakua tukevia ominaisuuksia niin on hyvä, että tapahtumillaan on oma uniikki tunnisteensa. Lisätään tämä tieto siis Tapahtumat tauluun.
+
+Paikoilla tulee olla oma uniikki tunnisteensa, sillä jokaisella paikalla tulee olla eri nimi. Tämän lisäksi paikkaid lisätään myös Paketti tauluun. Harjoitustyössä ei mainittu hakua, joka kertoisi, missä tilaajan paketti oikein on tällä hetkellä. Tällä hetkellä tiedon saa hakemalla kaikki pakettiin liittyvät tapahtumat ja tapahtumapaikat jotka järjestetään aikaleiman mukaan ja otetaan tuorein niistä tarkasteluun. Periaatteessa tietoa ei kannata säilyttää kahdessa eri paikassa, jos sen saa päättelemällä selville muualtakin, mutta näin olennaisen haun suorittamisen helpottamiseksi on perusteltavaa, että Paketti tauluun lisätään myös tieto paketin nykyisestä sijainnista.
+
+Kuva 2 näyttää tietokantakaavion näiden muutosten jälken.
+
+(tähän viimeisin kuvio - tuleeko vielä 3 vaihe?)
+
+Tällä toteutuksella järjestelmä noudattaa hyvin perusperiaatteita 2 ja 3. Periaatteesta 4 on tingitty, jotta saimme toteutettua tehokkaamman haun, sille missä tietty paketti sijaitsee tällä hetkellä. Periaatetta 1 voi tarkastella lähdekoodista käsin - mikään järjestelmään rakennettu ominaisuus ei tee muutoksia tietokantoihin paitsi toiminnallisuus, joka alustaa kaikki taulut.
+
+2.2. SQL-skeema
+
+3. Tietokantasovelluksen työstäminen

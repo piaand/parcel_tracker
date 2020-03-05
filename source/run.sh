@@ -1,1 +1,2 @@
-javac Dashboard.java Place.java Orderer.java Event.java Ptest.java Testplace.java Testorderer.java Testparcel.java Testevent.java && java -classpath ":sqlite-jdbc-3.30.1.jar" Dashboard
+( cd /src/parcel_tracking && javac Dashboard.java Parcel.java Place.java Orderer.java Event.java Ptest.java Testplace.java Testorderer.java Testparcel.java Askinput.java )
+( cd /src && java -classpath ".:sqlite-jdbc-3.30.1.jar" parcel_tracking.Dashboard )

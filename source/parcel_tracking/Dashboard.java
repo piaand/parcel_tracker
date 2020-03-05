@@ -1,6 +1,8 @@
+package parcel_tracking;
 import java.text.*;
 import java.util.*;
 import java.sql.*;
+import parcel_tracking.*;
 
 public class Dashboard {
 	static String db_name = "parcels.db";
@@ -11,8 +13,10 @@ public class Dashboard {
 		boolean inList;
 		List<Integer> instructions = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
-		initDatabase(db_connection, db_name, index_on);
 		printWelcome();
+		initDatabase(db_connection, db_name, index_on);
+		//updateIndexCount(db_connection, db_name);
+		Event.updateEventCount(db_connection, db_name);
 
 		Askinput key = new Askinput("What to do next: ");
 		while (key.nb != 9)
@@ -125,7 +129,7 @@ public class Dashboard {
 			Orderer myorderer = new Orderer();
 			myorderer.insertOrderer();
 		} catch (Exception e) {
-			System.out.println("Error: Adding a new orderer to database didn't succeed - please try agin.\n");
+			System.out.println("Error: Adding a new orderer to database didn't succeed - please try again.\n");
 		}
 	}
 
@@ -143,6 +147,7 @@ public class Dashboard {
 				if (orderer_id > 0)
 				{
 					Event myevent = new Event(place_id, parcel_id.text);
+					myevent.askEventDescription();
 					myevent.insertEvent();
 				} else {
 					System.out.println("This parcel is not in the database.");
@@ -189,33 +194,29 @@ public class Dashboard {
 	}
 
 	public static void runPerformanceTest(boolean index_on, Ptest mytest) throws SQLException {
-		initDatabase(db_connection, db_name, index_on);
-		mytest.addTestData(db_connection, db_name);
-		mytest.queryParcels(db_connection, db_name);
-		mytest.queryEvents(db_connection, db_name);
-		mytest.deleteTestdata(db_connection, db_name);
+		String db_name_test = "performancetest.db";
+		initDatabase(db_connection, db_name_test, index_on);
+		mytest.addTestData(db_connection, db_name_test);
+		mytest.queryParcels(db_connection, db_name_test);
+		mytest.queryEvents(db_connection, db_name_test);
+		mytest.deleteTestdata(db_name_test);
 	}
 	
 	public static void performanceTesting() throws SQLException {
-		int index;
-		Scanner input = new Scanner(System.in);
 		System.out.println("Doing performance tests\n");
-		System.out.print("Press 0 to run test without index and 1 to run with index: ");
-		index = input.nextInt();
+		Askinput index = new Askinput("Press 0 to run test without index and 1 to run with index: ");
+		index.askQuestionInt();
 		Ptest mytest = new Ptest();
-		db_name = "performancetest.db";
-		if (index == 0) {
+		if (index.nb == 0) {
 			index_on = false;
 			runPerformanceTest(index_on, mytest);
-		} else if (index == 1) {
+		} else if (index.nb == 1) {
 			index_on = true;
 			runPerformanceTest(index_on, mytest);
 		} else {
 			System.out.println("Press either 1 or 0.\n");
 		}
 	}
-
-	
 
 	public static void queryAll(String table_name) throws SQLException {
 		Connection db = null;
@@ -313,10 +314,13 @@ public class Dashboard {
 		}
 	}
 
+	/*public static void updateIndexCount(String db_connection, String db_name) {
+		Event.updateEventCount(db_connection, db_name);
+	}*/
+
 	public static void initDatabase(String db_connection, String db_name, boolean index) throws SQLException {
 		Connection db = null;
 		Statement statement = null;
-		ResultSet result = null;
 		String connection_param = db_connection + db_name;
 
 		try {
@@ -336,7 +340,6 @@ public class Dashboard {
 				throw e;
 			}
 		} finally {
-			try { result.close(); } catch (Exception e) { /* ignored */ }
 			try { statement.close(); } catch (Exception e) { /* ignored */ }
 			try { db.close(); } catch (Exception e) { /* ignored */ }
 		}

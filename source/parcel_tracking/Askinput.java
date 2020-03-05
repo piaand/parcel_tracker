@@ -1,3 +1,4 @@
+package parcel_tracking;
 import java.util.*;
 
 public class Askinput {
@@ -23,12 +24,4 @@ public class Askinput {
 		this.nb = this.input.nextInt();
 	}
 
-	/*public static String askTable() {
-		String table;
-		Scanner input = new Scanner(System.in);
-	
-		System.out.print("Enter the name of the table you want to query: ");
-		table = input.nextLine();
-		return (table);
-	}*/
 }
