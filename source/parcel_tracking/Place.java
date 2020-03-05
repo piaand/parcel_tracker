@@ -8,11 +8,19 @@ public class Place {
 	public String name;
 	private static int count = 1;
 	
-	public Place() {
-		Scanner input = new Scanner(System.in);
-		System.out.println("Enter here the name of the place: ");
-		this.name = input.nextLine();
+	public Place(String place_name) {
+		this.name = place_name;
 		this.id = count;
+	}
+
+	public static String askPlace() {
+		Askinput place = new Askinput("Enter here the name of the place: ");
+		place.askQuestionText();
+		return (place.text);
+	}
+
+	public void setPlaceID(int id) {
+		this.id = id;
 	}
 
 	public void printPlace() {
@@ -22,6 +30,14 @@ public class Place {
 
 	public static void updatePlaceCount(int current_count) throws SQLException {
 		count = current_count + 1;
+	}
+
+	public String getName() {
+		return (this.name);
+	}
+
+	public int getID() {
+		return (this.id);
 	}
 
 	public int inDatabase() throws SQLException {

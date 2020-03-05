@@ -9,20 +9,20 @@ public class Ptest {
 	int orderer_amount = 1000;
 	int parcel_amount = 1000;
 	int event_amount = 1000000;
-	List<Testplace> tplace;
+	List<Place> test_places;
 	List<Testorderer> torderer;
 	List<Testparcel> tparcel;
 	List<Event> test_events;
 
 	public Ptest() {
-		List<Testplace> tplace = new ArrayList<>();
+		List<Place> test_places = new ArrayList<>();
 		List<Testorderer> torderer = new ArrayList<>();
 		List<Testparcel> tparcel = new ArrayList<>();
 		List<Event> test_events = new ArrayList<>();
-		this.tplace = createPlaces(tplace);
+		this.test_places = createPlaces(test_places);
 		this.torderer = createOrderers(torderer);
 		this.tparcel = createParcels(tparcel, torderer);
-		this.test_events = createEvents(test_events, tparcel, tplace);
+		this.test_events = createEvents(test_events, tparcel, test_places);
 		
 	}
 	private void measureTime(long start, String mssg) {
@@ -112,7 +112,7 @@ public class Ptest {
 		String id_parcel = null;
 		String parcel_id = null;
 		String desc = null;
-		int len_place = this.tplace.size();
+		int len_place = this.test_places.size();
 		int len_orderer = this.torderer.size();
 		int len_parcel = this.tparcel.size();
 		int len_event = this.test_events.size();
@@ -124,8 +124,8 @@ public class Ptest {
 			p1 = db.prepareStatement("INSERT INTO Place(id,name) VALUES (?,?)");
 			
 			while (i < len_place) {
-				id_place = this.tplace.get(i).getID();
-				place = this.tplace.get(i).getName();
+				id_place = this.test_places.get(i).getID();
+				place = this.test_places.get(i).getName();
 				p1.setInt(1,id_place);
 				p1.setString(2,place);
 				p1.executeUpdate();
@@ -207,7 +207,7 @@ public class Ptest {
 		}
 	}
 
-	private List<Testplace> createPlaces(List<Testplace> tplace) {
+	private List<Place> createPlaces(List<Place> test_places) {
 		String name;
 		String rootname = "PL";
 		int count = 1;
@@ -215,11 +215,12 @@ public class Ptest {
 		while (count <= place_amount) {
 			String itoa = Integer.toString(count);
 			name = String.join("", rootname, itoa);
-			Testplace testPlace = new Testplace(name, count);
-			tplace.add(testPlace);
+			Place testPlace = new Place(name);
+			testPlace.setPlaceID(count);
+			test_places.add(testPlace);
 			count++;
 		}
-		return (tplace);	
+		return (test_places);	
 	}
 
 	private List<Testorderer> createOrderers(List<Testorderer> torderer) {
@@ -256,14 +257,14 @@ public class Ptest {
 		return (tparcel);	
 	}
 
-	private List<Event> createEvents(List<Event> test_events, List<Testparcel> tparcel, List<Testplace> tplace) {
+	private List<Event> createEvents(List<Event> test_events, List<Testparcel> tparcel, List<Place> test_places) {
 		Random rand = new Random();
 		String parcel;
 		int place;
 		int count = 1;
 		
 		while (count <= event_amount) {
-			place = tplace.get(rand.nextInt(tplace.size())).getID(); 
+			place = test_places.get(rand.nextInt(test_places.size())).getID(); 
 			parcel = tparcel.get(rand.nextInt(tparcel.size())).getTrackID(); 
 			Event testevent = new Event(place, parcel);
 			testevent.setID(count);

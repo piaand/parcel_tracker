@@ -105,8 +105,10 @@ public class Dashboard {
 
 	public static void addPlacetoDB() throws SQLException {
 		System.out.println("Add a new place\n");
+		String place_name;
 		try {
-			Place myplace = new Place();
+			place_name = Place.askPlace();
+			Place myplace = new Place(place_name);
 			myplace.insertPlace();
 		} catch (Exception e) {
 			System.out.println("Error: Adding a new place to database didn't succeed - please try agin.\n");
@@ -143,9 +145,11 @@ public class Dashboard {
 	public static void addEventtoDB() throws SQLException {
 		int orderer_id;
 		int place_id;
+		String place_name;
 		System.out.println("Add a new event\n");
 		try {
-			Place myplace = new Place();
+			place_name = Place.askPlace();
+			Place myplace = new Place(place_name);
 			place_id = myplace.inDatabase();
 			if (place_id > 0) {
 				Askinput parcel_id = new Askinput("Enter the parcel tracking id: ");
@@ -188,8 +192,10 @@ public class Dashboard {
 
 	public static void fetchPlaceParcels() throws SQLException {
 		int place_id;
+		String place_name;
 		System.out.println("Fetch amount events at a place on a date\n");
-		Place myplace = new Place();
+		place_name = Place.askPlace();
+		Place myplace = new Place(place_name);
 		place_id = myplace.inDatabase();
 		if (place_id > 0) {
 			Askinput date = new Askinput("Enter the date with the format yyyy-mm-dd: ");
