@@ -339,7 +339,6 @@ public class Dashboard {
 			statement.execute("CREATE TABLE Orderer (id INTEGR PRIMARY KEY, first_name STRING, last_name STRING)");
 			statement.execute("CREATE TABLE Place (id INTEGER PRIMARY KEY, name STRING UNIQUE)");
 			statement.execute("CREATE TABLE Event (id INTEGER PRIMARY KEY, tracing_id STRING, place_id INTEGER, event_time STRING, description STRING, FOREIGN KEY(tracing_id) REFERENCES Parcel(id), FOREIGN KEY(place_id) REFERENCES Place(id))");
-			placeIndex(index, statement);
 		} catch (SQLException e) {
 			int error = e.getErrorCode();
 			if (error == 1) {
@@ -348,6 +347,12 @@ public class Dashboard {
 				System.out.print("Here the Error: "+error+"\n\nand the end.");
 				throw e;
 			}
+		} try {
+			placeIndex(index, statement);
+		} catch (SQLException e) {
+			int error = e.getErrorCode();
+			System.out.print("Error: placing index faced an error: "+error+"\n\nand the end.");
+			System.out.print( e );
 		} finally {
 			try { statement.close(); } catch (Exception e) { /* ignored */ }
 			try { db.close(); } catch (Exception e) { /* ignored */ }
@@ -360,12 +365,10 @@ public class Dashboard {
 				statement.execute("CREATE INDEX e_parcel_index ON Event(tracing_id)");
 				statement.execute("CREATE INDEX p_orderer_index ON Parcel(order_id)");
 			} else {
-				statement.execute("DROP INDEX [IF EXISTS] e_parcel_index");
-				statement.execute("DROP INDEX [IF EXISTS] p_orderer_index");
+				statement.execute("DROP INDEX IF EXISTS e_parcel_index");
+				statement.execute("DROP INDEX IF EXISTS p_orderer_index");
 			}	
 		} catch (SQLException e) {
-			int error = e.getErrorCode();
-			System.out.print("Error: placing index faced an error: "+error+"\n\nand the end.");
 			throw e;
 		}
 	}
@@ -393,7 +396,7 @@ public class Dashboard {
 				System.out.print("This table name doesn't exist.");
 			}	
 		} catch (Exception e) {
-			//TODO: handle exception
+			throw e;
 		}
 	}
 

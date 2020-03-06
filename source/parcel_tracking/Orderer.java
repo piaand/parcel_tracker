@@ -9,13 +9,21 @@ public class Orderer {
 	public String last_name;
 	private static int count = 1;
 	
-	public Orderer() {
-		Scanner input = new Scanner(System.in);
-		System.out.println("Enter here the first name of the person that orders: ");
-		this.first_name = input.nextLine();
-		System.out.println("Then enter here the last name of the orderer: ");
-		this.last_name = input.nextLine();
+	public Orderer(String name, String lastname,) {
 		this.id = count;
+		this.first_name = name:
+		this.last_name + lastname
+	}
+
+	public static askOrderer() {
+		Askinput orderer_first = new Askinput("Enter here the first name of the person that orders: ");
+		orderer_first.askQuestionText();
+		Askinput orderer_last = new Askinput("Then enter here the last name of the orderer: ");
+		orderer_last.askQuestionText();
+	}
+
+	public void seOrdererID(int id) {
+		this.id = id;
 	}
 
 	public static void updateOrdererCount(int current_count) throws SQLException {
