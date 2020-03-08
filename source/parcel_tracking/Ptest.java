@@ -10,18 +10,18 @@ public class Ptest {
 	int parcel_amount = 1000;
 	int event_amount = 1000000;
 	List<Place> test_places;
-	List<Testorderer> torderer;
+	List<Orderer> test_orderers;
 	List<Testparcel> tparcel;
 	List<Event> test_events;
 
 	public Ptest() {
 		List<Place> test_places = new ArrayList<>();
-		List<Testorderer> torderer = new ArrayList<>();
+		List<Orderer> test_orderers = new ArrayList<>();
 		List<Testparcel> tparcel = new ArrayList<>();
 		List<Event> test_events = new ArrayList<>();
 		this.test_places = createPlaces(test_places);
-		this.torderer = createOrderers(torderer);
-		this.tparcel = createParcels(tparcel, torderer);
+		this.test_orderers = createOrderers(test_orderers);
+		this.tparcel = createParcels(tparcel, test_orderers);
 		this.test_events = createEvents(test_events, tparcel, test_places);
 		
 	}
@@ -47,7 +47,7 @@ public class Ptest {
 			p = db.prepareStatement("SELECT COUNT(b) AS parcel_count FROM (SELECT Parcel.id AS b, Orderer.id AS c FROM Orderer LEFT JOIN Parcel ON Parcel.order_id=Orderer.id) WHERE c=?");
 			start = System.nanoTime();
 			while (count < queries) {
-				id = torderer.get(rand.nextInt(torderer.size())).getID();
+				id = test_orderers.get(rand.nextInt(test_orderers.size())).getID();
 				p.setInt(1,id);
 				p.executeQuery();
 				count++;
@@ -113,7 +113,7 @@ public class Ptest {
 		String parcel_id = null;
 		String desc = null;
 		int len_place = this.test_places.size();
-		int len_orderer = this.torderer.size();
+		int len_orderer = this.test_orderers.size();
 		int len_parcel = this.tparcel.size();
 		int len_event = this.test_events.size();
 		int i = 0;
@@ -137,9 +137,9 @@ public class Ptest {
 			i = 0;
 			p2 = db.prepareStatement("INSERT INTO Orderer(id,first_name,last_name) VALUES (?,?,?)");
 			while (i < len_orderer) {
-				id_orderer = this.torderer.get(i).getID();
-				f_name = this.torderer.get(i).getfName();
-				l_name = this.torderer.get(i).getlName();
+				id_orderer = this.test_orderers.get(i).getID();
+				f_name = this.test_orderers.get(i).getfName();
+				l_name = this.test_orderers.get(i).getlName();
 				p2.setInt(1,id_orderer);
 				p2.setString(2,f_name);
 				p2.setString(3,l_name);
@@ -223,7 +223,7 @@ public class Ptest {
 		return (test_places);	
 	}
 
-	private List<Testorderer> createOrderers(List<Testorderer> torderer) {
+	private List<Orderer> createOrderers(List<Orderer> test_orderers) {
 		String name;
 		String rootname = "O";
 		String lastname = "Test";
@@ -232,14 +232,15 @@ public class Ptest {
 		while (count <= orderer_amount) {
 			String itoa = Integer.toString(count);
 			name = String.join("", rootname, itoa);
-			Testorderer testOrderer = new Testorderer(name, lastname, count);
-			torderer.add(testOrderer);
+			Orderer testOrderer = new Orderer(name, lastname);
+			testOrderer.setOrdererID(count);
+			test_orderers.add(testOrderer);
 			count++;
 		}
-		return (torderer);	
+		return (test_orderers);	
 	}
 
-	private List<Testparcel> createParcels(List<Testparcel> tparcel, List<Testorderer> torderer) {
+	private List<Testparcel> createParcels(List<Testparcel> tparcel, List<Orderer> test_orderers) {
 		String name;
 		String rootname = "PP";
 		int orderer;
@@ -249,7 +250,7 @@ public class Ptest {
 		while (count <= parcel_amount) {
 			String itoa = Integer.toString(count);
 			name = String.join("", rootname, itoa);
-			orderer = torderer.get(rand.nextInt(torderer.size())).getID(); 
+			orderer = test_orderers.get(rand.nextInt(test_orderers.size())).getID(); 
 			Testparcel testParcel = new Testparcel(name, orderer);
 			tparcel.add(testParcel);
 			count++;

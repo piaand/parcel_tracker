@@ -119,7 +119,9 @@ public class Dashboard {
 		int orderer_id;
 		System.out.println("Add a new parcel\n");
 		try {
-			Orderer myorderer = new Orderer();
+			String first_name = Orderer.askOrdererFirstname();
+			String last_name = Orderer.askOrdererLastname();
+			Orderer myorderer = new Orderer(first_name, last_name);
 			orderer_id = myorderer.inDatabase();
 			if (orderer_id > 0) {
 				Parcel myparcel = new Parcel(orderer_id);
@@ -135,7 +137,9 @@ public class Dashboard {
 	public static void addOrderertoDB() throws SQLException {
 		System.out.println("Add a new orderer\n");
 		try {
-			Orderer myorderer = new Orderer();
+			String first_name = Orderer.askOrdererFirstname();
+			String last_name = Orderer.askOrdererLastname();
+			Orderer myorderer = new Orderer(first_name, last_name);
 			myorderer.insertOrderer();
 		} catch (Exception e) {
 			System.out.println("Error: Adding a new orderer to database didn't succeed - please try again.\n");
@@ -181,7 +185,9 @@ public class Dashboard {
 	public static void fetchOrdererParcels() throws SQLException {
 		int orderer_id;
 		System.out.println("Fetch amount events of all parcels of the orderer\n");
-		Orderer myorderer = new Orderer();
+		String first_name = Orderer.askOrdererFirstname();
+		String last_name = Orderer.askOrdererLastname();
+		Orderer myorderer = new Orderer(first_name, last_name);
 		orderer_id = myorderer.inDatabase();
 		if (orderer_id > 0) {
 			myorderer.getParcelIDs(orderer_id);

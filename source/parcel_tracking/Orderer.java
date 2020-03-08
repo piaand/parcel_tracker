@@ -9,20 +9,25 @@ public class Orderer {
 	public String last_name;
 	private static int count = 1;
 	
-	public Orderer(String name, String lastname,) {
+	public Orderer(String name, String lastname) {
 		this.id = count;
-		this.first_name = name:
-		this.last_name + lastname
+		this.first_name = name;
+		this.last_name = lastname;
 	}
 
-	public static askOrderer() {
+	public static String askOrdererFirstname() {
 		Askinput orderer_first = new Askinput("Enter here the first name of the person that orders: ");
 		orderer_first.askQuestionText();
-		Askinput orderer_last = new Askinput("Then enter here the last name of the orderer: ");
-		orderer_last.askQuestionText();
+		return (orderer_first.text);
 	}
 
-	public void seOrdererID(int id) {
+	public static String askOrdererLastname() {
+		Askinput orderer_last = new Askinput("Then enter here the last name of the orderer: ");
+		orderer_last.askQuestionText();
+		return (orderer_last.text);
+}	
+
+	public void setOrdererID(int id) {
 		this.id = id;
 	}
 
@@ -33,6 +38,18 @@ public class Orderer {
 	public void printOrderer() {
 		System.out.println("Name of the orderer: "+ first_name +" "+ last_name);
 		System.out.println("And their ID:"+ id );
+	}
+
+	public String getfName() {
+		return this.first_name;
+	}
+
+	public String getlName() {
+		return this.last_name;
+	}
+
+	public int getID() {
+		return this.id;
 	}
 
 	public int inDatabase() throws SQLException {
