@@ -19,9 +19,16 @@ public class Askinput {
 		this.text = this.input.nextLine();
 	}
 
-	public void askQuestionInt() {
-		System.out.print(this.question);
-		this.nb = this.input.nextInt();
+	public boolean askQuestionInt() {
+		try {
+			System.out.print(this.question);
+			this.nb = this.input.nextInt();
+			return (true);	
+		} catch (InputMismatchException e) {
+			System.out.println("Please insert numbers.");
+			this.nb = 0;
+			return (false);
+		}
 	}
 
 }

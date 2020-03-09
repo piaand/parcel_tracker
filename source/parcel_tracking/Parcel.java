@@ -74,7 +74,6 @@ public class Parcel {
 		}
 	}
 
-
 	public void insertParcel() throws SQLException {
 		Connection db = null;
 		PreparedStatement p = null;

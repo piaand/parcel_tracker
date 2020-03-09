@@ -11,10 +11,8 @@ public class Dashboard {
 	
 	public static void main(String[] args) throws SQLException {
 		try  {
-			boolean inList;
 			int i = 0;
 			int count;
-			List<Integer> instructions = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
 			printWelcome();
 			initDatabase(db_connection, db_name, index_on);
@@ -24,21 +22,34 @@ public class Dashboard {
 				i++;
 			}
 
-			Askinput key = new Askinput("What to do next: ");
-			while (key.nb != 9)
+			int key = 0;
+			while (key != 9)
 			{
-				printInstructions();
-				key.askQuestionInt();
-				while (!(inList = instructions.contains(key.nb))) {
-					System.out.println("Nope, try again.");
-					key.askQuestionInt();
-				}
-				switchTable(key.nb);
+				key = runInstruction(key);
 			}
 		} catch (SQLException e) {
 			System.out.println("Error: system will close");
 			throw e;
 		}
+	}
+
+	public static int runInstruction(int key_nb) throws SQLException {
+		boolean is_int;
+		boolean inList;
+		List<Integer> instructions = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+
+		Askinput key = new Askinput("What to do next: ");
+		printInstructions();
+		is_int = key.askQuestionInt();
+		key_nb = key.nb;
+		while (is_int && !(inList = instructions.contains(key_nb))) {
+			System.out.println("Nope, try again.");
+			is_int = key.askQuestionInt();
+		}
+		if (is_int) {
+			switchTable(key_nb);
+		}
+		return(key_nb);
 	}
 
 	public static void switchTable(int key) throws SQLException {
@@ -227,14 +238,22 @@ public class Dashboard {
 	}
 	
 	public static void performanceTesting() throws SQLException {
+		boolean is_int = false;
+		int index_nb = -1;
+
 		System.out.println("Doing performance tests\n");
-		Askinput index = new Askinput("Press 0 to run test without index and 1 to run with index: ");
-		index.askQuestionInt();
+		while (!is_int) {
+			Askinput index = new Askinput("Press 0 to run test without index and 1 to run with index: ");
+			is_int = index.askQuestionInt();
+			if (is_int) {
+				index_nb = index.nb;
+			}
+		}
 		Ptest mytest = new Ptest();
-		if (index.nb == 0) {
+		if (index_nb == 0) {
 			index_on = false;
 			runPerformanceTest(index_on, mytest);
-		} else if (index.nb == 1) {
+		} else if (index_nb == 1) {
 			index_on = true;
 			runPerformanceTest(index_on, mytest);
 		} else {
