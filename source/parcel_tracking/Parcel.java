@@ -36,10 +36,10 @@ public class Parcel {
 		return this.orderer_id;
 	}
 
-	public String inDatabase() throws SQLException {
+	public String inDatabase(String db_connection, String db_name) throws SQLException {
 		String id;
 
-		id = getParcelid();
+		id = getParcelid(db_connection, db_name);
 		if (id == null) {
 			System.out.println("This parcel is not in the database.");
 			return (null);
@@ -49,14 +49,15 @@ public class Parcel {
 		}
 	}
 
-	public static void getParcelEvents(String id) {
+	public static void getParcelEvents(String id, String db_connection, String db_name) {
 		Connection db = null;
 		PreparedStatement p = null;
 		ResultSet r = null;
 		int count = 0;
+		String connection_param = db_connection + db_name;
 
 		try {
-			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+			db = DriverManager.getConnection(connection_param);
 
 			p = db.prepareStatement("SELECT * FROM Event WHERE tracing_id=?");
 			p.setString(1,id);
@@ -78,14 +79,15 @@ public class Parcel {
 		}
 	}
 
-	public static int getParcelOrderer(String id) {
+	public static int getParcelOrderer(String id, String db_connection, String db_name) {
 		int db_orderid = -1;
 		Connection db = null;
 		PreparedStatement p = null;
 		ResultSet r = null;
+		String connection_param = db_connection + db_name;
 
 		try {
-			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+			db = DriverManager.getConnection(connection_param);
 
 			p = db.prepareStatement("SELECT * FROM Parcel WHERE id=?");
 			p.setString(1,id);
@@ -102,14 +104,15 @@ public class Parcel {
 		}
 	}
 
-	public String getParcelid() {
+	public String getParcelid(String db_connection, String db_name) {
 		String db_id = null;
 		Connection db = null;
 		PreparedStatement p = null;
 		ResultSet r = null;
+		String connection_param = db_connection + db_name;
 
 		try {
-			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+			db = DriverManager.getConnection(connection_param);
 
 			p = db.prepareStatement("SELECT id FROM Parcel WHERE id=?");
 			p.setString(1,this.id);
@@ -127,12 +130,13 @@ public class Parcel {
 		}
 	}
 
-	public void insertParcel() throws SQLException {
+	public void insertParcel(String db_connection, String db_name) throws SQLException {
 		Connection db = null;
 		PreparedStatement p = null;
+		String connection_param = db_connection + db_name;
 
 		try {
-			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+			db = DriverManager.getConnection(connection_param);
 			p = db.prepareStatement("INSERT INTO Parcel(id,order_id) VALUES (?,?)");
 			p.setString(1,this.id);
 			p.setInt(2,this.orderer_id);

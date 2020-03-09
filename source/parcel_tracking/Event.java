@@ -56,15 +56,16 @@ public class Event {
 		return this.description;
 	}
 
-	public void insertEvent() throws SQLException {
+	public void insertEvent(String db_connection, String db_name) throws SQLException {
 		Connection db = null;
 		PreparedStatement p = null;
+		String connection_param = db_connection + db_name;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		String ts = sdf.format(timestamp);
 
 		try {
-			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+			db = DriverManager.getConnection(connection_param);
 			p = db.prepareStatement("INSERT INTO Event(id,tracing_id,place_id,event_time,description) VALUES (?,?,?,?,?)");
 			p.setInt(1,this.id);
 			p.setString(2,this.parcel_id);

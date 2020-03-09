@@ -40,10 +40,10 @@ public class Place {
 		return (this.id);
 	}
 
-	public int inDatabase() throws SQLException {
+	public int inDatabase(String db_connection, String db_name) throws SQLException {
 		int id;
 
-		id = getPlaceid();
+		id = getPlaceid(db_connection, db_name);
 		if (id < 1) {
 			System.out.println("This place is not in the database.");
 			return (-1);
@@ -53,14 +53,15 @@ public class Place {
 		}
 	}
 
-	public int getPlaceid() throws SQLException {
+	public int getPlaceid(String db_connection, String db_name) throws SQLException {
 		int db_id = -1;
 		Connection db = null;
 		PreparedStatement p = null;
 		ResultSet r = null;
+		String connection_param = db_connection + db_name;
 
 		try {
-			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+			db = DriverManager.getConnection(connection_param);
 
 			p = db.prepareStatement("SELECT id FROM Place WHERE name=?");
 			p.setString(1,this.name);
@@ -78,11 +79,12 @@ public class Place {
 		}
 	}
 
-	public void fetchEvents(String date) throws SQLException {
+	public void fetchEvents(String date, String db_connection, String db_name) throws SQLException {
 		Connection db = null;
 		PreparedStatement p = null;
 		ResultSet r = null;
 		int count = 0;
+		String connection_param = db_connection + db_name;
 
 		date = date.replace("!", "!!")
 		.replace("%", "!%")
@@ -90,7 +92,7 @@ public class Place {
 		.replace("[", "![");
 
 		 try {
-			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+			db = DriverManager.getConnection(connection_param);
 			p = db.prepareStatement("SELECT b, name, COUNT(id) AS event_count FROM (SELECT id AS b, name FROM Place WHERE id=?) LEFT JOIN (SELECT id, place_id FROM Event WHERE event_time LIKE ? ESCAPE '!') ON b=place_id GROUP BY b");
 			p.setInt(1,this.id);
 			p.setString(2, date + "%");
@@ -112,11 +114,13 @@ public class Place {
 		 }
 	}
 
-	public void insertPlace() throws SQLException {
+	public void insertPlace(String db_connection, String db_name) throws SQLException {
 		Connection db = null;
 		PreparedStatement p = null;
+		String connection_param = db_connection + db_name;
+
 		try {
-			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+			db = DriverManager.getConnection(connection_param);
 			p = db.prepareStatement("INSERT INTO Place(id,name) VALUES (?,?)");
 			p.setInt(1,this.id);
 			p.setString(2,this.name);

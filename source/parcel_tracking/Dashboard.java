@@ -120,7 +120,7 @@ public class Dashboard {
 		try {
 			place_name = Place.askPlace();
 			Place myplace = new Place(place_name);
-			myplace.insertPlace();
+			myplace.insertPlace(db_connection, db_name);
 		} catch (Exception e) {
 			System.out.println("Error: Adding a new place to database didn't succeed - please try agin.\n");
 		}
@@ -135,11 +135,11 @@ public class Dashboard {
 			String first_name = Orderer.askOrdererFirstname();
 			String last_name = Orderer.askOrdererLastname();
 			Orderer myorderer = new Orderer(first_name, last_name);
-			orderer_id = myorderer.inDatabase();
+			orderer_id = myorderer.inDatabase(db_connection, db_name);
 			if (orderer_id > 0) {
 				parcel_id = Parcel.askParcelID();
 				Parcel myparcel = new Parcel(parcel_id, orderer_id);
-				myparcel.insertParcel();
+				myparcel.insertParcel(db_connection, db_name);
 			} else {
 				System.out.println("Please enter a unique orderer name or orderer name with representative id.");
 			}
@@ -154,7 +154,7 @@ public class Dashboard {
 			String first_name = Orderer.askOrdererFirstname();
 			String last_name = Orderer.askOrdererLastname();
 			Orderer myorderer = new Orderer(first_name, last_name);
-			myorderer.insertOrderer();
+			myorderer.insertOrderer(db_connection, db_name);
 		} catch (Exception e) {
 			System.out.println("Error: Adding a new orderer to database didn't succeed - please try again.\n");
 		}
@@ -170,15 +170,15 @@ public class Dashboard {
 		try {
 			place_name = Place.askPlace();
 			Place myplace = new Place(place_name);
-			place_id = myplace.inDatabase();
+			place_id = myplace.inDatabase(db_connection, db_name);
 			if (place_id > 0) {
 				parcel_id = Parcel.askParcelID();
-				orderer_id = Parcel.getParcelOrderer(parcel_id);
+				orderer_id = Parcel.getParcelOrderer(parcel_id, db_connection, db_name);
 				if (orderer_id > 0)
 				{
 					Event myevent = new Event(place_id, parcel_id);
 					myevent.askEventDescription();
-					myevent.insertEvent();
+					myevent.insertEvent(db_connection, db_name);
 				} else {
 					System.out.println("This parcel is not in the database.");
 				}
@@ -195,7 +195,7 @@ public class Dashboard {
 
 		System.out.println("Fetch all events of a parcel\n");
 		parcel_id = Parcel.askParcelID();
-		Parcel.getParcelEvents(parcel_id);
+		Parcel.getParcelEvents(parcel_id, db_connection, db_name);
 	}
 
 	public static void fetchOrdererParcels() throws SQLException {
@@ -204,9 +204,9 @@ public class Dashboard {
 		String first_name = Orderer.askOrdererFirstname();
 		String last_name = Orderer.askOrdererLastname();
 		Orderer myorderer = new Orderer(first_name, last_name);
-		orderer_id = myorderer.inDatabase();
+		orderer_id = myorderer.inDatabase(db_connection, db_name);
 		if (orderer_id > 0) {
-			myorderer.getParcelIDs(orderer_id);
+			myorderer.getParcelIDs(orderer_id, db_connection, db_name);
 		} else {
 			System.out.println("Please enter a unique orderer name or orderer name with representative id.");
 		}
@@ -218,11 +218,11 @@ public class Dashboard {
 		System.out.println("Fetch amount events at a place on a date\n");
 		place_name = Place.askPlace();
 		Place myplace = new Place(place_name);
-		place_id = myplace.inDatabase();
+		place_id = myplace.inDatabase(db_connection, db_name);
 		if (place_id > 0) {
 			Askinput date = new Askinput("Enter the date with the format yyyy-mm-dd: ");
 			date.askQuestionText();
-			myplace.fetchEvents(date.text);
+			myplace.fetchEvents(date.text, db_connection, db_name);
 		} else {
 			System.out.println("This place is not in the database.");
 		}

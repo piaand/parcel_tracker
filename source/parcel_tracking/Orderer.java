@@ -52,23 +52,23 @@ public class Orderer {
 		return this.id;
 	}
 
-	public int inDatabase() throws SQLException {
+	public int inDatabase(String db_connection, String db_name) throws SQLException {
 		int amount;
 		int found;
 
-		amount = getMatchingOrdererAmount();
+		amount = getMatchingOrdererAmount(db_connection, db_name);
 		if (amount < 1) {
 			System.out.println("There is no orderer with this name in the database.");
 			return (-1);
 		} else if (amount == 1) {
-			this.id = getOrdererID();
+			this.id = getOrdererID(db_connection, db_name);
 			return(this.id);
 		} else {
 			Scanner input = new Scanner(System.in);
 			System.out.println("Several orderers were found with this name.");
 			System.out.println("Please insert the orderer's id: ");
 			this.id = input.nextInt();
-			found = checkOrdererID();
+			found = checkOrdererID(db_connection, db_name);
 			if (found > 0)
 			{
 				return (found);
@@ -78,14 +78,15 @@ public class Orderer {
 		}
 	}
 
-	public int getOrdererID() throws SQLException {
+	public int getOrdererID(String db_connection, String db_name) throws SQLException {
 		int db_id;
 		Connection db = null;
 		PreparedStatement p = null;
 		ResultSet r = null;
+		String connection_param = db_connection + db_name;
 
 		try {
-			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+			db = DriverManager.getConnection(connection_param);
 
 			p = db.prepareStatement("SELECT id FROM Orderer WHERE first_name=? AND last_name=?");
 			p.setString(1,this.first_name);
@@ -105,16 +106,17 @@ public class Orderer {
 		
 	}
 
-	public int checkOrdererID() throws SQLException {
+	public int checkOrdererID(String db_connection, String db_name) throws SQLException {
 		int id = -1;
 		String db_fname;
 		String db_lname;
 		Connection db = null;
 		PreparedStatement p = null;
 		ResultSet r = null;
+		String connection_param = db_connection + db_name;
 
 		try {
-			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+			db = DriverManager.getConnection(connection_param);
 
 			p = db.prepareStatement("SELECT * FROM Orderer WHERE id=?");
 			p.setInt(1,this.id);
@@ -144,14 +146,15 @@ public class Orderer {
 		}
 	}
 
-	public int getMatchingOrdererAmount() throws SQLException {
+	public int getMatchingOrdererAmount(String db_connection, String db_name) throws SQLException {
 		int row_nb = -1;
 		Connection db = null;
 		PreparedStatement p = null;
 		ResultSet r = null;
+		String connection_param = db_connection + db_name;
 		
 		try {
-			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+			db = DriverManager.getConnection(connection_param);
 	
 			p = db.prepareStatement("SELECT COUNT(*) AS rowcount FROM Orderer WHERE first_name=? AND last_name=?");
 			p.setString(1,this.first_name);
@@ -170,15 +173,16 @@ public class Orderer {
 	}
 
 
-	public void getParcelIDs(int orderer_id) throws SQLException {
+	public void getParcelIDs(int orderer_id, String db_connection, String db_name) throws SQLException {
 		Connection db = null;
 		PreparedStatement p = null;
 		ResultSet r = null;
 		this.id = orderer_id;
 		int count = 0;
+		String connection_param = db_connection + db_name;
 
 		 try {
-			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+			db = DriverManager.getConnection(connection_param);
 			p = db.prepareStatement("SELECT b, COUNT(id) AS event_count FROM (SELECT id AS b FROM Parcel WHERE order_id=?) LEFT JOIN Event ON b=tracing_id GROUP BY b");
 			p.setInt(1,this.id);
 	
@@ -199,12 +203,13 @@ public class Orderer {
 		 }
 	}
 
-	public void insertOrderer() throws SQLException {
+	public void insertOrderer(String db_connection, String db_name) throws SQLException {
 		Connection db = null;
 		PreparedStatement p = null;
+		String connection_param = db_connection + db_name;
 
 		try {
-			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
+			db = DriverManager.getConnection(connection_param);
 			p = db.prepareStatement("INSERT INTO Orderer(id,first_name,last_name) VALUES (?,?,?)");
 			p.setInt(1,this.id);
 			p.setString(2,this.first_name);
