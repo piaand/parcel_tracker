@@ -173,7 +173,7 @@ public class Dashboard {
 			place_id = myplace.inDatabase();
 			if (place_id > 0) {
 				parcel_id = Parcel.askParcelID();
-				orderer_id = getParcelOrderer(parcel_id);
+				orderer_id = Parcel.getParcelOrderer(parcel_id);
 				if (orderer_id > 0)
 				{
 					Event myevent = new Event(place_id, parcel_id);
@@ -195,7 +195,7 @@ public class Dashboard {
 
 		System.out.println("Fetch all events of a parcel\n");
 		parcel_id = Parcel.askParcelID();
-		getParcelEvents(parcel_id);
+		Parcel.getParcelEvents(parcel_id);
 	}
 
 	public static void fetchOrdererParcels() throws SQLException {
@@ -241,7 +241,7 @@ public class Dashboard {
 		boolean is_int = false;
 		int index_nb = -1;
 
-		System.out.println("Doing performance tests\n");
+		System.out.println("Doing performance tests with 1000 places, 1000 parcels, 1000 orderers and 1 million events.\n");
 		while (!is_int) {
 			Askinput index = new Askinput("Press 0 to run test without index and 1 to run with index: ");
 			is_int = index.askQuestionInt();
@@ -304,58 +304,6 @@ public class Dashboard {
 		
 	}
 
-	public static void getParcelEvents(String id) {
-		Connection db = null;
-		PreparedStatement p = null;
-		ResultSet r = null;
-		int count = 0;
-
-		try {
-			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
-
-			p = db.prepareStatement("SELECT * FROM Event WHERE tracing_id=?");
-			p.setString(1,id);
-
-			r = p.executeQuery();
-			while (r.next()) {
-				System.out.println("Event id: "+r.getInt("id")+" at place "+r.getInt("place_id")+" happened "+r.getString("event_time")+"\nDescription: "+r.getString("description"));
-				count++;
-			}
-			if (count == 0) {
-				System.out.println("This parcel id has no events in the database.");
-			}
-		} catch (Exception e) {
-			System.out.println("Error: this parcel id found no events.");
-		} finally {
-			try { r.close(); } catch (Exception e) { /* ignored */ }
-    		try { p.close(); } catch (Exception e) { /* ignored */ }
-			try { db.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-
-	public static int getParcelOrderer(String id) {
-		int db_orderid = -1;
-		Connection db = null;
-		PreparedStatement p = null;
-		ResultSet r = null;
-
-		try {
-			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
-
-			p = db.prepareStatement("SELECT * FROM Parcel WHERE id=?");
-			p.setString(1,id);
-
-			r = p.executeQuery();
-			db_orderid = r.getInt("order_id");
-		} catch (Exception e) {
-			System.out.println("Error: this parcel id found no orderer id.");
-		} finally {
-			try { r.close(); } catch (Exception e) { /* ignored */ }
-    		try { p.close(); } catch (Exception e) { /* ignored */ }
-			try { db.close(); } catch (Exception e) { /* ignored */ }
-			return (db_orderid);
-		}
-	}
 
 	public static void initDatabase(String db_connection, String db_name, boolean index) throws SQLException {
 		Connection db = null;
