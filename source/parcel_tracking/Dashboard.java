@@ -117,6 +117,8 @@ public class Dashboard {
 
 	public static void addParceltoDB() throws SQLException {
 		int orderer_id;
+		String parcel_id;
+
 		System.out.println("Add a new parcel\n");
 		try {
 			String first_name = Orderer.askOrdererFirstname();
@@ -124,7 +126,8 @@ public class Dashboard {
 			Orderer myorderer = new Orderer(first_name, last_name);
 			orderer_id = myorderer.inDatabase();
 			if (orderer_id > 0) {
-				Parcel myparcel = new Parcel(orderer_id);
+				parcel_id = Parcel.askParcelID();
+				Parcel myparcel = new Parcel(parcel_id, orderer_id);
 				myparcel.insertParcel();
 			} else {
 				System.out.println("Please enter a unique orderer name or orderer name with representative id.");
@@ -150,18 +153,19 @@ public class Dashboard {
 		int orderer_id;
 		int place_id;
 		String place_name;
+		String parcel_id;
+
 		System.out.println("Add a new event\n");
 		try {
 			place_name = Place.askPlace();
 			Place myplace = new Place(place_name);
 			place_id = myplace.inDatabase();
 			if (place_id > 0) {
-				Askinput parcel_id = new Askinput("Enter the parcel tracking id: ");
-				parcel_id.askQuestionText();
-				orderer_id = getParcelOrderer(parcel_id.text);
+				parcel_id = Parcel.askParcelID();
+				orderer_id = getParcelOrderer(parcel_id);
 				if (orderer_id > 0)
 				{
-					Event myevent = new Event(place_id, parcel_id.text);
+					Event myevent = new Event(place_id, parcel_id);
 					myevent.askEventDescription();
 					myevent.insertEvent();
 				} else {
@@ -176,10 +180,11 @@ public class Dashboard {
 	}
 
 	public static void fetchParcelEvents() throws SQLException {
+		String parcel_id;
+
 		System.out.println("Fetch all events of a parcel\n");
-		Askinput parcel_id = new Askinput("Enter the parcel tracking id: ");
-		parcel_id.askQuestionText();
-		getParcelEvents(parcel_id.text);
+		parcel_id = Parcel.askParcelID();
+		getParcelEvents(parcel_id);
 	}
 
 	public static void fetchOrdererParcels() throws SQLException {
@@ -341,7 +346,7 @@ public class Dashboard {
 		try {
 			db = DriverManager.getConnection(connection_param);
 			statement = db.createStatement();
-			statement.execute("CREATE TABLE Parcel (id STRING PRIMARY KEY, order_id INTEGER, FOREIGN KEY(order_id) REFERENCES Orderer(id))");
+			statement.execute("CREATE TABLE Parcel (id STRING UNIQUE PRIMARY KEY, order_id INTEGER, FOREIGN KEY(order_id) REFERENCES Orderer(id))");
 			statement.execute("CREATE TABLE Orderer (id INTEGR PRIMARY KEY, first_name STRING, last_name STRING)");
 			statement.execute("CREATE TABLE Place (id INTEGER PRIMARY KEY, name STRING UNIQUE)");
 			statement.execute("CREATE TABLE Event (id INTEGER PRIMARY KEY, tracing_id STRING, place_id INTEGER, event_time STRING, description STRING, FOREIGN KEY(tracing_id) REFERENCES Parcel(id), FOREIGN KEY(place_id) REFERENCES Place(id))");

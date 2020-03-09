@@ -1,18 +1,22 @@
 package parcel_tracking;
 import java.util.*; 
-import java.sql.*; // Import Java sql package
+import java.sql.*;
 
 public class Parcel {
 	
 	public String id;
-	public int order_id;;
+	public int orderer_id;
 	private static int count = 1;
 	
-	public Parcel (int orderer_id) {
-		Scanner input = new Scanner(System.in);
-		System.out.println("Enter here the parcel tracking code: ");
-		this.id = input.nextLine();
-		this.order_id = orderer_id;
+	public Parcel (String tracking_id, int orderer_id) {
+		this.id = tracking_id;
+		this.orderer_id = orderer_id;
+	}
+
+	public static String askParcelID() {
+		Askinput parcel = new Askinput("Enter here the parcel tracking code: ");
+		parcel.askQuestionText();
+		return (parcel.text);
 	}
 
 	public static void updateParcelCount(int current_count) throws SQLException {
@@ -21,7 +25,15 @@ public class Parcel {
 
 	public void printParcel() {
 		System.out.println("Parcel id: "+ this.id );
-		System.out.println("From the orderer whos id is "+ this.order_id);
+		System.out.println("From the orderer whos id is "+ this.orderer_id);
+	}
+
+	public String getTrackID() {
+		return this.id;
+	}
+
+	public int getOrderer() {
+		return this.orderer_id;
 	}
 
 	public String inDatabase() throws SQLException {
@@ -71,7 +83,7 @@ public class Parcel {
 			db = DriverManager.getConnection("jdbc:sqlite:parcels.db");
 			p = db.prepareStatement("INSERT INTO Parcel(id,order_id) VALUES (?,?)");
 			p.setString(1,this.id);
-			p.setInt(2,this.order_id);
+			p.setInt(2,this.orderer_id);
 
 			p.executeUpdate();
 			System.out.println("Added the following:");

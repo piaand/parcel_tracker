@@ -11,20 +11,21 @@ public class Ptest {
 	int event_amount = 1000000;
 	List<Place> test_places;
 	List<Orderer> test_orderers;
-	List<Testparcel> tparcel;
+	List<Parcel> test_parcels;
 	List<Event> test_events;
 
 	public Ptest() {
 		List<Place> test_places = new ArrayList<>();
 		List<Orderer> test_orderers = new ArrayList<>();
-		List<Testparcel> tparcel = new ArrayList<>();
+		List<Parcel> test_parcels = new ArrayList<>();
 		List<Event> test_events = new ArrayList<>();
 		this.test_places = createPlaces(test_places);
 		this.test_orderers = createOrderers(test_orderers);
-		this.tparcel = createParcels(tparcel, test_orderers);
-		this.test_events = createEvents(test_events, tparcel, test_places);
+		this.test_parcels = createParcels(test_parcels, test_orderers);
+		this.test_events = createEvents(test_events, test_parcels, test_places);
 		
 	}
+
 	private void measureTime(long start, String mssg) {
 		long stop = System.nanoTime();
 		long nanos = stop - start;
@@ -76,7 +77,7 @@ public class Ptest {
 			p = db.prepareStatement("SELECT COUNT(b) AS event_count FROM (SELECT Event.id AS b, Parcel.id AS c FROM Parcel LEFT JOIN Event ON Parcel.id=Event.tracing_id) WHERE c=?");
 			start = System.nanoTime();
 			while (count < queries) {
-				id = tparcel.get(rand.nextInt(tparcel.size())).getTrackID();
+				id = test_parcels.get(rand.nextInt(test_parcels.size())).getTrackID();
 				p.setString(1,id);
 				p.executeQuery();
 				count++;
@@ -114,7 +115,7 @@ public class Ptest {
 		String desc = null;
 		int len_place = this.test_places.size();
 		int len_orderer = this.test_orderers.size();
-		int len_parcel = this.tparcel.size();
+		int len_parcel = this.test_parcels.size();
 		int len_event = this.test_events.size();
 		int i = 0;
 		try {
@@ -152,8 +153,8 @@ public class Ptest {
 			i = 0;
 			p3 = db.prepareStatement("INSERT INTO Parcel(id,order_id) VALUES (?,?)");
 			while (i < len_parcel) {
-				id_parcel = this.tparcel.get(i).getTrackID();
-				orderer_id = this.tparcel.get(i).getOrderer();
+				id_parcel = this.test_parcels.get(i).getTrackID();
+				orderer_id = this.test_parcels.get(i).getOrderer();
 				p3.setString(1,id_parcel);
 				p3.setInt(2,orderer_id);
 				p3.executeUpdate();
@@ -240,7 +241,7 @@ public class Ptest {
 		return (test_orderers);	
 	}
 
-	private List<Testparcel> createParcels(List<Testparcel> tparcel, List<Orderer> test_orderers) {
+	private List<Parcel> createParcels(List<Parcel> test_parcels, List<Orderer> test_orderers) {
 		String name;
 		String rootname = "PP";
 		int orderer;
@@ -251,14 +252,14 @@ public class Ptest {
 			String itoa = Integer.toString(count);
 			name = String.join("", rootname, itoa);
 			orderer = test_orderers.get(rand.nextInt(test_orderers.size())).getID(); 
-			Testparcel testParcel = new Testparcel(name, orderer);
-			tparcel.add(testParcel);
+			Parcel testParcel = new Parcel(name, orderer);
+			test_parcels.add(testParcel);
 			count++;
 		}
-		return (tparcel);	
+		return (test_parcels);	
 	}
 
-	private List<Event> createEvents(List<Event> test_events, List<Testparcel> tparcel, List<Place> test_places) {
+	private List<Event> createEvents(List<Event> test_events, List<Parcel> test_parcels, List<Place> test_places) {
 		Random rand = new Random();
 		String parcel;
 		int place;
@@ -266,7 +267,7 @@ public class Ptest {
 		
 		while (count <= event_amount) {
 			place = test_places.get(rand.nextInt(test_places.size())).getID(); 
-			parcel = tparcel.get(rand.nextInt(tparcel.size())).getTrackID(); 
+			parcel = test_parcels.get(rand.nextInt(test_parcels.size())).getTrackID(); 
 			Event testevent = new Event(place, parcel);
 			testevent.setID(count);
 			test_events.add(testevent);
