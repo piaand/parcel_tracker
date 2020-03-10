@@ -81,26 +81,26 @@ public class Orderer {
 	public int getOrdererID(String db_connection, String db_name) throws SQLException {
 		int db_id;
 		Connection db = null;
-		PreparedStatement p = null;
-		ResultSet r = null;
+		PreparedStatement preparedStatement = null;
+		ResultSet result = null;
 		String connection_param = db_connection + db_name;
 
 		try {
 			db = DriverManager.getConnection(connection_param);
 
-			p = db.prepareStatement("SELECT id FROM Orderer WHERE first_name=? AND last_name=?");
-			p.setString(1,this.first_name);
-			p.setString(2,this.last_name);
+			preparedStatement = db.prepareStatement("SELECT id FROM Orderer WHERE first_name=? AND last_name=?");
+			preparedStatement.setString(1,this.first_name);
+			preparedStatement.setString(2,this.last_name);
 
-			r = p.executeQuery();
-			db_id = r.getInt("id");
+			result = preparedStatement.executeQuery();
+			db_id = result.getInt("id");
 			return (db_id);
 		} catch (Exception e) {
 			System.out.println("Error: getting orderer id failed");
 			throw e;
 		} finally {
-			try { r.close(); } catch (Exception e) { /* ignored */ }
-    		try { p.close(); } catch (Exception e) { /* ignored */ }
+			try { result.close(); } catch (Exception e) { /* ignored */ }
+    		try { preparedStatement.close(); } catch (Exception e) { /* ignored */ }
     		try { db.close(); } catch (Exception e) { /* ignored */ }
 		}
 		
@@ -111,21 +111,21 @@ public class Orderer {
 		String db_fname;
 		String db_lname;
 		Connection db = null;
-		PreparedStatement p = null;
-		ResultSet r = null;
+		PreparedStatement preparedStatement = null;
+		ResultSet result = null;
 		String connection_param = db_connection + db_name;
 
 		try {
 			db = DriverManager.getConnection(connection_param);
 
-			p = db.prepareStatement("SELECT * FROM Orderer WHERE id=?");
-			p.setInt(1,this.id);
+			preparedStatement = db.prepareStatement("SELECT * FROM Orderer WHERE id=?");
+			preparedStatement.setInt(1,this.id);
 
-			r = p.executeQuery();
-			if (r.next()) {
-				System.out.println("ID "+r.getInt("id")+" was found!");
-				db_fname = r.getString("first_name");
-				db_lname = r.getString("last_name");
+			result = preparedStatement.executeQuery();
+			if (result.next()) {
+				System.out.println("ID "+result.getInt("id")+" was found!");
+				db_fname = result.getString("first_name");
+				db_lname = result.getString("last_name");
 				if (this.first_name.equals(db_fname) && this.last_name.equals(db_lname)) {
 					System.out.println("The orderer "+this.first_name+" "+this.last_name+" exists in the database.");
 					id = this.id;
@@ -139,8 +139,8 @@ public class Orderer {
 		} catch (Exception e) {
 			System.out.println("Error: checking orderer id faced an exception. Please try again.");
 		} finally {
-			try { r.close(); } catch (Exception e) { /* ignored */ }
-			try { p.close(); } catch (Exception e) { /* ignored */ }
+			try { result.close(); } catch (Exception e) { /* ignored */ }
+			try { preparedStatement.close(); } catch (Exception e) { /* ignored */ }
 			try { db.close(); } catch (Exception e) { /* ignored */ }
 			return (id);
 		}
@@ -149,24 +149,24 @@ public class Orderer {
 	public int getMatchingOrdererAmount(String db_connection, String db_name) throws SQLException {
 		int row_nb = -1;
 		Connection db = null;
-		PreparedStatement p = null;
-		ResultSet r = null;
+		PreparedStatement preparedStatement = null;
+		ResultSet result = null;
 		String connection_param = db_connection + db_name;
 		
 		try {
 			db = DriverManager.getConnection(connection_param);
 	
-			p = db.prepareStatement("SELECT COUNT(*) AS rowcount FROM Orderer WHERE first_name=? AND last_name=?");
-			p.setString(1,this.first_name);
-			p.setString(2,this.last_name);
+			preparedStatement = db.prepareStatement("SELECT COUNT(*) AS rowcount FROM Orderer WHERE first_name=? AND last_name=?");
+			preparedStatement.setString(1,this.first_name);
+			preparedStatement.setString(2,this.last_name);
 	
-			r = p.executeQuery();
+			result = preparedStatement.executeQuery();
 			row_nb = r.getInt("rowcount");	
 		} catch (Exception e) {
 			System.out.println("Error: finding orderer with name faced an exception. Please try again.");
 		} finally {
-			try { r.close(); } catch (Exception e) { /* ignored */ }
-			try { p.close(); } catch (Exception e) { /* ignored */ }
+			try { result.close(); } catch (Exception e) { /* ignored */ }
+			try { preparedStatement.close(); } catch (Exception e) { /* ignored */ }
 			try { db.close(); } catch (Exception e) { /* ignored */ }
 			return (row_nb);
 		}
@@ -175,18 +175,18 @@ public class Orderer {
 
 	public void getParcelIDs(int orderer_id, String db_connection, String db_name) throws SQLException {
 		Connection db = null;
-		PreparedStatement p = null;
-		ResultSet r = null;
+		PreparedStatement preparedStatement = null;
+		ResultSet result = null;
 		this.id = orderer_id;
 		int count = 0;
 		String connection_param = db_connection + db_name;
 
 		 try {
 			db = DriverManager.getConnection(connection_param);
-			p = db.prepareStatement("SELECT b, COUNT(id) AS event_count FROM (SELECT id AS b FROM Parcel WHERE orderer_id=?) LEFT JOIN Event ON b=tracking_id GROUP BY b");
-			p.setInt(1,this.id);
+			preparedStatement = db.prepareStatement("SELECT b, COUNT(id) AS event_count FROM (SELECT id AS b FROM Parcel WHERE orderer_id=?) LEFT JOIN Event ON b=tracking_id GROUP BY b");
+			preparedStatement.setInt(1,this.id);
 	
-			r = p.executeQuery();
+			result = preparedStatement.executeQuery();
 			while (r.next()) {
 				System.out.println("Parcel: "+r.getString("b")+" has "+r.getInt("event_count")+" events");
 				count++;
@@ -197,32 +197,32 @@ public class Orderer {
 		 } catch (Exception e) {
 			System.out.println("Error: getting parcels from orderer faced an exception. Please try again.");
 		 } finally {
-			try { r.close(); } catch (Exception e) { /* ignored */ }
-			try { p.close(); } catch (Exception e) { /* ignored */ }
+			try { result.close(); } catch (Exception e) { /* ignored */ }
+			try { preparedStatement.close(); } catch (Exception e) { /* ignored */ }
 			try { db.close(); } catch (Exception e) { /* ignored */ }
 		 }
 	}
 
 	public void insertOrderer(String db_connection, String db_name) throws SQLException {
 		Connection db = null;
-		PreparedStatement p = null;
+		PreparedStatement preparedStatement = null;
 		String connection_param = db_connection + db_name;
 
 		try {
 			db = DriverManager.getConnection(connection_param);
-			p = db.prepareStatement("INSERT INTO Orderer(id,first_name,last_name) VALUES (?,?,?)");
-			p.setInt(1,this.id);
-			p.setString(2,this.first_name);
-			p.setString(3,this.last_name);
+			preparedStatement = db.prepareStatement("INSERT INTO Orderer(id,first_name,last_name) VALUES (?,?,?)");
+			preparedStatement.setInt(1,this.id);
+			preparedStatement.setString(2,this.first_name);
+			preparedStatement.setString(3,this.last_name);
 
-			p.executeUpdate();
+			preparedStatement.executeUpdate();
 			System.out.println("Added the following:");
 			this.printOrderer();
 			count++;
 		} catch (Exception e) {
 			System.out.println("Error: inserting orderer faced an exception. Please try again.");
 		} finally {
-			try { p.close(); } catch (Exception e) { /* ignored */ }
+			try { preparedStatement.close(); } catch (Exception e) { /* ignored */ }
 			try { db.close(); } catch (Exception e) { /* ignored */ }
 		}
 		

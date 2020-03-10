@@ -51,16 +51,16 @@ public class Parcel {
 
 	public static void getParcelEvents(String id, String db_connection, String db_name) {
 		Connection db = null;
-		PreparedStatement p = null;
-		ResultSet r = null;
+		PreparedStatement preparedStatement = null;
+		ResultSet result = null;
 		int count = 0;
 		String connection_param = db_connection + db_name;
 
 		try {
 			db = DriverManager.getConnection(connection_param);
 
-			p = db.prepareStatement("SELECT * FROM Event WHERE tracking_id=?");
-			p.setString(1,id);
+			preparedStatement = db.prepareStatement("SELECT * FROM Event WHERE tracking_id=?");
+			preparedStatement.setString(1,id);
 
 			r = p.executeQuery();
 			while (r.next()) {
@@ -114,17 +114,17 @@ public class Parcel {
 		try {
 			db = DriverManager.getConnection(connection_param);
 
-			p = db.prepareStatement("SELECT id FROM Parcel WHERE id=?");
-			p.setString(1,this.id);
+			preparedStatement = db.prepareStatement("SELECT id FROM Parcel WHERE id=?");
+			preparedStatement.setString(1,this.id);
 
-			r = p.executeQuery();
-			db_id = r.getString("id");
+			result = preparedStatement.executeQuery();
+			db_id = result.getString("id");
 		} catch (Exception e) {
 			System.out.println("Error: getting Parcel id failed");
 			throw e;
 		} finally {
-			try { r.close(); } catch (Exception e) { /* ignored */ }
-    		try { p.close(); } catch (Exception e) { /* ignored */ }
+			try { result.close(); } catch (Exception e) { /* ignored */ }
+    		try { preparedStatement.close(); } catch (Exception e) { /* ignored */ }
 			try { db.close(); } catch (Exception e) { /* ignored */ }
 			return (db_id);
 		}
@@ -132,22 +132,22 @@ public class Parcel {
 
 	public void insertParcel(String db_connection, String db_name) throws SQLException {
 		Connection db = null;
-		PreparedStatement p = null;
+		PreparedStatement preparedStatement = null;
 		String connection_param = db_connection + db_name;
 
 		try {
 			db = DriverManager.getConnection(connection_param);
-			p = db.prepareStatement("INSERT INTO Parcel(id,orderer_id) VALUES (?,?)");
-			p.setString(1,this.id);
-			p.setInt(2,this.orderer_id);
+			preparedStatement = db.prepareStatement("INSERT INTO Parcel(id,orderer_id) VALUES (?,?)");
+			preparedStatement.setString(1,this.id);
+			preparedStatement.setInt(2,this.orderer_id);
 
-			p.executeUpdate();
+			preparedStatement.executeUpdate();
 			System.out.println("Added the following:");
 			this.printParcel();
 		} catch (Exception e) {
 			System.out.println("Error: inserting parcel data faced an exception. Please try again.");
 		} finally {
-			try { p.close(); } catch (Exception e) { /* ignored */ }
+			try { preparedStatement.close(); } catch (Exception e) { /* ignored */ }
     		try { db.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}

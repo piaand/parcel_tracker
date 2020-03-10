@@ -58,31 +58,30 @@ public class Event {
 
 	public void insertEvent(String db_connection, String db_name) throws SQLException {
 		Connection db = null;
-		PreparedStatement p = null;
+		PreparedStatement preparedStatement = null;
 		String connection_param = db_connection + db_name;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-		String ts = sdf.format(timestamp);
+		String event_time = sdf.format(timestamp);
 
 		try {
 			db = DriverManager.getConnection(connection_param);
-			p = db.prepareStatement("INSERT INTO Event(id,tracking_id,place_id,event_time,description) VALUES (?,?,?,?,?)");
-			p.setInt(1,this.id);
-			p.setString(2,this.tracking_id);
-			p.setInt(3,this.place_id);
-			p.setString(4,ts);
-			p.setString(5,this.description);
+			preparedStatement = db.prepareStatement("INSERT INTO Event(id,tracking_id,place_id,event_time,description) VALUES (?,?,?,?,?)");
+			preparedStatement.setInt(1,this.id);
+			preparedStatement.setString(2,this.tracking_id);
+			preparedStatement.setInt(3,this.place_id);
+			preparedStatement.setString(4,ts);
+			preparedStatement.setString(5,this.description);
 
 			p.executeUpdate();
-			this.timestamp = ts;
+			this.timestamp = event_time;
 			System.out.println("Added the following:");
 			this.printEvent();
 			count++;
 		} catch (Exception e) {
 			System.out.println("Error: inserting event failed. Please try again.");
-			System.out.println( e );
 		} finally {
-			try { p.close(); } catch (Exception e) { /* ignored */ }
+			try { preparedStatement.close(); } catch (Exception e) { /* ignored */ }
 			try { db.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}

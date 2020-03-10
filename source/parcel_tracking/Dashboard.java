@@ -263,32 +263,32 @@ public class Dashboard {
 
 	public static void queryAll(String table_name) throws SQLException {
 		Connection db = null;
-		Statement s = null;
-		ResultSet r = null;
+		Statement statement = null;
+		ResultSet result = null;
 		String connection_param = db_connection + db_name;
 
 		try {
 			db = DriverManager.getConnection(connection_param);
-			s = db.createStatement();
+			statement = db.createStatement();
 			if (table_name.equals("Place")) {
-				r = s.executeQuery("SELECT * FROM Place");
-				while (r.next()) {
-					System.out.println(r.getInt("id")+" "+r.getString("name"));
+				result = statement.executeQuery("SELECT * FROM Place");
+				while (result.next()) {
+					System.out.println(result.getInt("id")+" "+result.getString("name"));
 				}
 			} else if (table_name.equals("Orderer")) {
-				r = s.executeQuery("SELECT * FROM Orderer");
-				while (r.next()) {
-					System.out.println(r.getInt("id")+" "+r.getString("first_name")+" "+r.getString("last_name"));
+				result = statement.executeQuery("SELECT * FROM Orderer");
+				while (result.next()) {
+					System.out.println(r.getInt("id")+" "+result.getString("first_name")+" "+result.getString("last_name"));
 				}
 			} else if (table_name.equals("Parcel")) {
-				r = s.executeQuery("SELECT * FROM Parcel");
-				while (r.next()) {
-					System.out.println(r.getString("id")+" "+r.getInt("orderer_id"));
+				result = statement.executeQuery("SELECT * FROM Parcel");
+				while (result.next()) {
+					System.out.println(result.getString("id")+" "+result.getInt("orderer_id"));
 				}
 			} else if (table_name.equals("Event")) {
-				r = s.executeQuery("SELECT * FROM Event");
-				while (r.next()) {
-					System.out.println(r.getInt("id")+" "+r.getString("tracking_id")+" "+r.getInt("place_id")+" "+r.getString("event_time")+" "+r.getString("description"));
+				result = statement.executeQuery("SELECT * FROM Event");
+				while (result.next()) {
+					System.out.println(result.getInt("id")+" "+result.getString("tracking_id")+" "+result.getInt("place_id")+" "+result.getString("event_time")+" "+result.getString("description"));
 				}
 			} else {
 				System.out.println("Table name was not found");
@@ -296,8 +296,8 @@ public class Dashboard {
 		} catch (Exception e) {
 			System.out.println("Error: querying tables faced an exception.");
 		} finally {
-			try { r.close(); } catch (Exception e) { /* ignored */ }
-			try { s.close(); } catch (Exception e) { /* ignored */ }
+			try { result.close(); } catch (Exception e) { /* ignored */ }
+			try { statement.close(); } catch (Exception e) { /* ignored */ }
 			try { db.close(); } catch (Exception e) { /* ignored */ }
 		}
 		
