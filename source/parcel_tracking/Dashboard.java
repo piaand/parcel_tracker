@@ -278,7 +278,7 @@ public class Dashboard {
 			} else if (table_name.equals("Orderer")) {
 				result = statement.executeQuery("SELECT * FROM Orderer");
 				while (result.next()) {
-					System.out.println(r.getInt("id")+" "+result.getString("first_name")+" "+result.getString("last_name"));
+					System.out.println(result.getInt("id")+" "+result.getString("first_name")+" "+result.getString("last_name"));
 				}
 			} else if (table_name.equals("Parcel")) {
 				result = statement.executeQuery("SELECT * FROM Parcel");

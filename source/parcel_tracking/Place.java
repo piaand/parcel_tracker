@@ -56,24 +56,24 @@ public class Place {
 	public int getPlaceid(String db_connection, String db_name) throws SQLException {
 		int db_id = -1;
 		Connection db = null;
-		PreparedStatement p = null;
-		ResultSet r = null;
+		PreparedStatement preparedStatement = null;
+		ResultSet result = null;
 		String connection_param = db_connection + db_name;
 
 		try {
 			db = DriverManager.getConnection(connection_param);
 
-			p = db.prepareStatement("SELECT id FROM Place WHERE name=?");
-			p.setString(1,this.name);
+			preparedStatement = db.prepareStatement("SELECT id FROM Place WHERE name=?");
+			preparedStatement.setString(1,this.name);
 
-			r = p.executeQuery();
-			db_id = r.getInt("id");
+			result = preparedStatement.executeQuery();
+			db_id = result.getInt("id");
 		} catch (Exception e) {
 			System.out.println("Error: getting Place id failed");
 			throw e;
 		} finally {
-			try { r.close(); } catch (Exception e) { /* ignored */ }
-    		try { p.close(); } catch (Exception e) { /* ignored */ }
+			try { result.close(); } catch (Exception e) { /* ignored */ }
+    		try { preparedStatement.close(); } catch (Exception e) { /* ignored */ }
 			try { db.close(); } catch (Exception e) { /* ignored */ }
 			return (db_id);
 		}
@@ -81,8 +81,8 @@ public class Place {
 
 	public void fetchEvents(String date, String db_connection, String db_name) throws SQLException {
 		Connection db = null;
-		PreparedStatement p = null;
-		ResultSet r = null;
+		PreparedStatement preparedStatement = null;
+		ResultSet result = null;
 		int count = 0;
 		String connection_param = db_connection + db_name;
 
@@ -93,13 +93,13 @@ public class Place {
 
 		 try {
 			db = DriverManager.getConnection(connection_param);
-			p = db.prepareStatement("SELECT b, name, COUNT(id) AS event_count FROM (SELECT id AS b, name FROM Place WHERE id=?) LEFT JOIN (SELECT id, place_id FROM Event WHERE event_time LIKE ? ESCAPE '!') ON b=place_id GROUP BY b");
-			p.setInt(1,this.id);
-			p.setString(2, date + "%");
+			preparedStatement = db.prepareStatement("SELECT b, name, COUNT(id) AS event_count FROM (SELECT id AS b, name FROM Place WHERE id=?) LEFT JOIN (SELECT id, place_id FROM Event WHERE event_time LIKE ? ESCAPE '!') ON b=place_id GROUP BY b");
+			preparedStatement.setInt(1,this.id);
+			preparedStatement.setString(2, date + "%");
 	
-			r = p.executeQuery();
-			while (r.next()) {
-				System.out.println("Place: "+r.getString("name")+" has "+r.getInt("event_count")+" events");
+			result = preparedStatement.executeQuery();
+			while (result.next()) {
+				System.out.println("Place: "+result.getString("name")+" has "+result.getInt("event_count")+" events");
 				count++;
 			}
 			if (count == 0) {
@@ -108,31 +108,31 @@ public class Place {
 		 } catch (Exception e) {
 			System.out.println("Error: Failed to fetch event amounts. Please try again.");
 		 } finally {
-			try { r.close(); } catch (Exception e) { /* ignored */ }
-			try { p.close(); } catch (Exception e) { /* ignored */ }
+			try { result.close(); } catch (Exception e) { /* ignored */ }
+			try { preparedStatement.close(); } catch (Exception e) { /* ignored */ }
 			try { db.close(); } catch (Exception e) { /* ignored */ }
 		 }
 	}
 
 	public void insertPlace(String db_connection, String db_name) throws SQLException {
 		Connection db = null;
-		PreparedStatement p = null;
+		PreparedStatement preparedStatement = null;
 		String connection_param = db_connection + db_name;
 
 		try {
 			db = DriverManager.getConnection(connection_param);
-			p = db.prepareStatement("INSERT INTO Place(id,name) VALUES (?,?)");
-			p.setInt(1,this.id);
-			p.setString(2,this.name);
+			preparedStatement = db.prepareStatement("INSERT INTO Place(id,name) VALUES (?,?)");
+			preparedStatement.setInt(1,this.id);
+			preparedStatement.setString(2,this.name);
 
-			p.executeUpdate();
+			preparedStatement.executeUpdate();
 			System.out.println("Added the following:");
 			this.printPlace();
 			count++;
 		} catch (Exception e) {
 			System.out.println("Error: inserting place failed. Please insert unique name for place and try again.");
 		} finally {
-			try { p.close(); } catch (Exception e) { /* ignored */ }
+			try { preparedStatement.close(); } catch (Exception e) { /* ignored */ }
 			try { db.close(); } catch (Exception e) { /* ignored */ }
 		}
 		

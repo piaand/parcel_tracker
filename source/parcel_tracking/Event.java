@@ -70,10 +70,10 @@ public class Event {
 			preparedStatement.setInt(1,this.id);
 			preparedStatement.setString(2,this.tracking_id);
 			preparedStatement.setInt(3,this.place_id);
-			preparedStatement.setString(4,ts);
+			preparedStatement.setString(4,event_time);
 			preparedStatement.setString(5,this.description);
 
-			p.executeUpdate();
+			preparedStatement.executeUpdate();
 			this.timestamp = event_time;
 			System.out.println("Added the following:");
 			this.printEvent();

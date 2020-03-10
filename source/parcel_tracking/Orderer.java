@@ -161,7 +161,7 @@ public class Orderer {
 			preparedStatement.setString(2,this.last_name);
 	
 			result = preparedStatement.executeQuery();
-			row_nb = r.getInt("rowcount");	
+			row_nb = result.getInt("rowcount");	
 		} catch (Exception e) {
 			System.out.println("Error: finding orderer with name faced an exception. Please try again.");
 		} finally {
@@ -187,8 +187,8 @@ public class Orderer {
 			preparedStatement.setInt(1,this.id);
 	
 			result = preparedStatement.executeQuery();
-			while (r.next()) {
-				System.out.println("Parcel: "+r.getString("b")+" has "+r.getInt("event_count")+" events");
+			while (result.next()) {
+				System.out.println("Parcel: "+result.getString("b")+" has "+result.getInt("event_count")+" events");
 				count++;
 			}
 			if (count == 0) {

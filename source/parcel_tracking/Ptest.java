@@ -1,5 +1,5 @@
 package parcel_tracking;
-import java.sql.*; // Impporta Java sql package
+import java.sql.*;
 import java.util.*;
 import java.text.*;
 import java.io.*;  
@@ -38,26 +38,26 @@ public class Ptest {
 		Random rand = new Random();
 		long start = 0;
 		Connection db = null;
-		PreparedStatement p = null;
+		PreparedStatement preparedStatement = null;
 		int id = 0;
 		int count = 0;
 		int queries = 1000;
 
 		 try {
 			db = DriverManager.getConnection(connection_param);
-			p = db.prepareStatement("SELECT COUNT(b) AS parcel_count FROM (SELECT Parcel.id AS b, Orderer.id AS c FROM Orderer LEFT JOIN Parcel ON Parcel.orderer_id=Orderer.id) WHERE c=?");
+			preparedStatement = db.prepareStatement("SELECT COUNT(b) AS parcel_count FROM (SELECT Parcel.id AS b, Orderer.id AS c FROM Orderer LEFT JOIN Parcel ON Parcel.orderer_id=Orderer.id) WHERE c=?");
 			start = System.nanoTime();
 			while (count < queries) {
 				id = test_orderers.get(rand.nextInt(test_orderers.size())).getID();
-				p.setInt(1,id);
-				p.executeQuery();
+				preparedStatement.setInt(1,id);
+				preparedStatement.executeQuery();
 				count++;
 			}
 			measureTime(start, "query amounts of orderers' parcels");
 		 } catch (Exception e) {
 			System.out.println("Error: performace test faced an exception. Please try again.");
 		 } finally {
-			try { p.close(); } catch (Exception e) { /* ignored */ }
+			try { preparedStatement.close(); } catch (Exception e) { /* ignored */ }
 			try { db.close(); } catch (Exception e) { /* ignored */ }
 		 }
 	}
@@ -67,26 +67,26 @@ public class Ptest {
 		Random rand = new Random();
 		long start = 0;
 		Connection db = null;
-		PreparedStatement p = null;
+		PreparedStatement preparedStatement = null;
 		String id = null;
 		int count = 0;
 		int queries = 1000;
 
 		 try {
 			db = DriverManager.getConnection(connection_param);
-			p = db.prepareStatement("SELECT COUNT(b) AS event_count FROM (SELECT Event.id AS b, Parcel.id AS c FROM Parcel LEFT JOIN Event ON Parcel.id=Event.tracking_id) WHERE c=?");
+			preparedStatement= db.prepareStatement("SELECT COUNT(b) AS event_count FROM (SELECT Event.id AS b, Parcel.id AS c FROM Parcel LEFT JOIN Event ON Parcel.id=Event.tracking_id) WHERE c=?");
 			start = System.nanoTime();
 			while (count < queries) {
 				id = test_parcels.get(rand.nextInt(test_parcels.size())).getTrackID();
-				p.setString(1,id);
-				p.executeQuery();
+				preparedStatement.setString(1,id);
+				preparedStatement.executeQuery();
 				count++;
 			}
 			measureTime(start, "query event amounts of parcels");
 		 } catch (Exception e) {
 			System.out.println("Error: performace test faced an exception. Please try again.");
 		 } finally {
-			try { p.close(); } catch (Exception e) { /* ignored */ }
+			try { preparedStatement.close(); } catch (Exception e) { /* ignored */ }
 			try { db.close(); } catch (Exception e) { /* ignored */ }
 		 }
 	}
