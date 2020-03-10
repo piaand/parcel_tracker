@@ -60,19 +60,21 @@ FROM debian:stretch-slim
 ENV JAVA_HOME=/opt/java-minimal
 ENV PATH="$PATH:$JAVA_HOME/bin"
 ENV SRC="/src"
-# ENV SQLITE_URL="https://bitbucket.org/xerial/sqlite-jdbc/downloads/sqlite-jdbc-3.30.1.jar"
-# ENV SQLITE="sqlite-jdbc-3.30.1.jar"
-
-#install vim and create sourcecode directory - delete vim after development
-RUN apt-get update && apt-get upgrade -y && apt-get install -y vim && \
-	mkdir -p "$SRC"
-
+ENV FILES="$SRC/parcel_tracking"
+ENV SQLITE_URL="https://bitbucket.org/xerial/sqlite-jdbc/downloads/sqlite-jdbc-3.30.1.jar"
+ENV SQLITE="sqlite-jdbc-3.30.1.jar"
 COPY --from=packager "$JAVA_HOME" "$JAVA_HOME"
+
+# Copy the source files in the container environment
 COPY "/source" "$SRC"
 
-# downlodad SQLite to the local file - fix the download to right folder at the end of development
-# ADD "$SQLITE_URL" "$SQLITE"
+# downlodad SQLite to the local file and move to src directory
+ADD "$SQLITE_URL" "$SQLITE"
+RUN mv "$SQLITE" "$SRC"
 
-EXPOSE 8080
-# CMD [ "app.java"] uncommented for development
-ENTRYPOINT [ "/bin/sh" ]
+# compile the java files in parcel_tracking directory
+WORKDIR "$FILES"
+RUN javac Dashboard.java Parcel.java Place.java Orderer.java Event.java Ptest.java Askinput.java
+
+WORKDIR "$SRC"
+ENTRYPOINT java -classpath ".:$SQLITE" parcel_tracking.Dashboard
