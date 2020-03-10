@@ -283,14 +283,13 @@ public class Dashboard {
 			} else if (table_name.equals("Parcel")) {
 				r = s.executeQuery("SELECT * FROM Parcel");
 				while (r.next()) {
-					System.out.println(r.getString("id")+" "+r.getInt("order_id"));
+					System.out.println(r.getString("id")+" "+r.getInt("orderer_id"));
 				}
 			} else if (table_name.equals("Event")) {
 				r = s.executeQuery("SELECT * FROM Event");
-				System.out.println("Event print not applied yet");
-				/*while (r.next()) {
-					System.out.println(r.getString("id")+" "+r.getInt("order_id"));
-				}*/
+				while (r.next()) {
+					System.out.println(r.getInt("id")+" "+r.getString("tracking_id")+" "+r.getInt("place_id")+" "+r.getString("event_time")+" "+r.getString("description"));
+				}
 			} else {
 				System.out.println("Table name was not found");
 			}
@@ -313,10 +312,10 @@ public class Dashboard {
 		try {
 			db = DriverManager.getConnection(connection_param);
 			statement = db.createStatement();
-			statement.execute("CREATE TABLE Parcel (id STRING UNIQUE PRIMARY KEY, order_id INTEGER, FOREIGN KEY(order_id) REFERENCES Orderer(id))");
+			statement.execute("CREATE TABLE Parcel (id STRING UNIQUE PRIMARY KEY, orderer_id INTEGER, FOREIGN KEY(orderer_id) REFERENCES Orderer(id))");
 			statement.execute("CREATE TABLE Orderer (id INTEGR PRIMARY KEY, first_name STRING, last_name STRING)");
 			statement.execute("CREATE TABLE Place (id INTEGER PRIMARY KEY, name STRING UNIQUE)");
-			statement.execute("CREATE TABLE Event (id INTEGER PRIMARY KEY, tracing_id STRING, place_id INTEGER, event_time STRING, description STRING, FOREIGN KEY(tracing_id) REFERENCES Parcel(id), FOREIGN KEY(place_id) REFERENCES Place(id))");
+			statement.execute("CREATE TABLE Event (id INTEGER PRIMARY KEY, tracking_id STRING, place_id INTEGER, event_time STRING, description STRING, FOREIGN KEY(tracking_id) REFERENCES Parcel(id), FOREIGN KEY(place_id) REFERENCES Place(id))");
 		} catch (SQLException e) {
 			int error = e.getErrorCode();
 			if (error == 1) {
@@ -340,8 +339,8 @@ public class Dashboard {
 	public static void placeIndex(boolean on, Statement statement) throws SQLException {
 		try {
 			if (on) {
-				statement.execute("CREATE INDEX e_parcel_index ON Event(tracing_id)");
-				statement.execute("CREATE INDEX p_orderer_index ON Parcel(order_id)");
+				statement.execute("CREATE INDEX e_parcel_index ON Event(tracking_id)");
+				statement.execute("CREATE INDEX p_orderer_index ON Parcel(orderer_id)");
 			} else {
 				statement.execute("DROP INDEX IF EXISTS e_parcel_index");
 				statement.execute("DROP INDEX IF EXISTS p_orderer_index");

@@ -59,7 +59,7 @@ public class Parcel {
 		try {
 			db = DriverManager.getConnection(connection_param);
 
-			p = db.prepareStatement("SELECT * FROM Event WHERE tracing_id=?");
+			p = db.prepareStatement("SELECT * FROM Event WHERE tracking_id=?");
 			p.setString(1,id);
 
 			r = p.executeQuery();
@@ -93,7 +93,7 @@ public class Parcel {
 			p.setString(1,id);
 
 			r = p.executeQuery();
-			db_orderid = r.getInt("order_id");
+			db_orderid = r.getInt("orderer_id");
 		} catch (Exception e) {
 			System.out.println("Error: this parcel id found no orderer id.");
 		} finally {
@@ -137,7 +137,7 @@ public class Parcel {
 
 		try {
 			db = DriverManager.getConnection(connection_param);
-			p = db.prepareStatement("INSERT INTO Parcel(id,order_id) VALUES (?,?)");
+			p = db.prepareStatement("INSERT INTO Parcel(id,orderer_id) VALUES (?,?)");
 			p.setString(1,this.id);
 			p.setInt(2,this.orderer_id);
 

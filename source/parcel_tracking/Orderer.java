@@ -183,7 +183,7 @@ public class Orderer {
 
 		 try {
 			db = DriverManager.getConnection(connection_param);
-			p = db.prepareStatement("SELECT b, COUNT(id) AS event_count FROM (SELECT id AS b FROM Parcel WHERE order_id=?) LEFT JOIN Event ON b=tracing_id GROUP BY b");
+			p = db.prepareStatement("SELECT b, COUNT(id) AS event_count FROM (SELECT id AS b FROM Parcel WHERE orderer_id=?) LEFT JOIN Event ON b=tracking_id GROUP BY b");
 			p.setInt(1,this.id);
 	
 			r = p.executeQuery();

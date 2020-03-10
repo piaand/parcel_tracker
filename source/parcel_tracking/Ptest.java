@@ -45,7 +45,7 @@ public class Ptest {
 
 		 try {
 			db = DriverManager.getConnection(connection_param);
-			p = db.prepareStatement("SELECT COUNT(b) AS parcel_count FROM (SELECT Parcel.id AS b, Orderer.id AS c FROM Orderer LEFT JOIN Parcel ON Parcel.order_id=Orderer.id) WHERE c=?");
+			p = db.prepareStatement("SELECT COUNT(b) AS parcel_count FROM (SELECT Parcel.id AS b, Orderer.id AS c FROM Orderer LEFT JOIN Parcel ON Parcel.orderer_id=Orderer.id) WHERE c=?");
 			start = System.nanoTime();
 			while (count < queries) {
 				id = test_orderers.get(rand.nextInt(test_orderers.size())).getID();
@@ -74,7 +74,7 @@ public class Ptest {
 
 		 try {
 			db = DriverManager.getConnection(connection_param);
-			p = db.prepareStatement("SELECT COUNT(b) AS event_count FROM (SELECT Event.id AS b, Parcel.id AS c FROM Parcel LEFT JOIN Event ON Parcel.id=Event.tracing_id) WHERE c=?");
+			p = db.prepareStatement("SELECT COUNT(b) AS event_count FROM (SELECT Event.id AS b, Parcel.id AS c FROM Parcel LEFT JOIN Event ON Parcel.id=Event.tracking_id) WHERE c=?");
 			start = System.nanoTime();
 			while (count < queries) {
 				id = test_parcels.get(rand.nextInt(test_parcels.size())).getTrackID();
@@ -151,7 +151,7 @@ public class Ptest {
 			
 			start = System.nanoTime();
 			i = 0;
-			p3 = db.prepareStatement("INSERT INTO Parcel(id,order_id) VALUES (?,?)");
+			p3 = db.prepareStatement("INSERT INTO Parcel(id,orderer_id) VALUES (?,?)");
 			while (i < len_parcel) {
 				id_parcel = this.test_parcels.get(i).getTrackID();
 				orderer_id = this.test_parcels.get(i).getOrderer();
@@ -164,11 +164,11 @@ public class Ptest {
 			
 			start = System.nanoTime();
 			i = 0;
-			p4 = db.prepareStatement("INSERT INTO Event(id,tracing_id,place_id,event_time,description) VALUES (?,?,?,?,?)");
+			p4 = db.prepareStatement("INSERT INTO Event(id,tracking_id,place_id,event_time,description) VALUES (?,?,?,?,?)");
 			while (i < len_event) {
 				id_event = this.test_events.get(i).getID();
 				place_id = this.test_events.get(i).getPlaceID();
-				parcel_id = this.test_events.get(i).getParcelID();
+				parcel_id = this.test_events.get(i).getTrackingID();
 				desc = this.test_events.get(i).getDescription();
 				p4.setInt(1,id_event);
 				p4.setInt(2,place_id);

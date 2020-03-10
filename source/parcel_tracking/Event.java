@@ -6,15 +6,15 @@ import java.sql.*;
 public class Event {
 	
 	public int id;
-	public String parcel_id;
+	public String tracking_id;
 	public int place_id;
 	public String description = "description is missing";
 	public String timestamp;
 	private static int count;
 	
-	public Event(int place_id, String parcel_id) {
+	public Event(int place_id, String tracking_id) {
 		this.id = count;
-		this.parcel_id = parcel_id;
+		this.tracking_id = tracking_id;
 		this.place_id = place_id;
 	}
 	
@@ -32,7 +32,7 @@ public class Event {
 	public void printEvent() {
 		System.out.println("Event description: "+ this.description );
 		System.out.println("ID:"+ id );
-		System.out.println("Was given during scanning "+ this.parcel_id +" parcel at location "+this.place_id+" at the time: "+this.timestamp);
+		System.out.println("Was given during scanning "+ this.tracking_id +" parcel at location "+this.place_id+" at the time: "+this.timestamp);
 	}
 
 	/* Running count can be bypassed for performance testing */
@@ -40,8 +40,8 @@ public class Event {
 		this.id = id;
 	}
 
-	public String getParcelID() {
-		return this.parcel_id;
+	public String getTrackingID() {
+		return this.tracking_id;
 	}
 
 	public int getID() {
@@ -66,9 +66,9 @@ public class Event {
 
 		try {
 			db = DriverManager.getConnection(connection_param);
-			p = db.prepareStatement("INSERT INTO Event(id,tracing_id,place_id,event_time,description) VALUES (?,?,?,?,?)");
+			p = db.prepareStatement("INSERT INTO Event(id,tracking_id,place_id,event_time,description) VALUES (?,?,?,?,?)");
 			p.setInt(1,this.id);
-			p.setString(2,this.parcel_id);
+			p.setString(2,this.tracking_id);
 			p.setInt(3,this.place_id);
 			p.setString(4,ts);
 			p.setString(5,this.description);
