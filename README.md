@@ -20,6 +20,7 @@ Inside the Docker container, there is a system that launches when the container 
 - quit the program
 
 Below picture shows the database relations between tables
+
 ![Parcels.db tables and relations](parcels_db_relations.png)
 
 ## Installation instructions
