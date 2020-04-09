@@ -11,6 +11,8 @@ The aim of this project was to learn:
 - effective SQL querying by using indexes and joins
 - development inside Docker containers
 
+## Features and database implementation
+
 Inside the Docker container, there is a system that launches when the container runs. It creates a database parcels.db and starts asking the user which actions the user wants to take. User may
 - add data such as orderers, events, parcels or places to the database
 - query events related to a parcel
